@@ -1,5 +1,7 @@
 package com.ojins.chatbot.dialog;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +28,38 @@ public class QAState {
     private List<String> answers = new ArrayList<String>();
     private Random rnd = new Random();
 
-    public Optional<String> getAnswer(boolean isRandom) {
+
+
+    public List<String> getAnswers() {
+        return answers;
+    }
+
+    public List<String> getQuestions() {
+        return questions;
+    }
+
+    // two qastates are considered as same if their answers are same
+    @Override
+    public int hashCode() {
+        return Math.abs(String.join("", answers).hashCode());
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof QAState))
+            return false;
+        if (obj == this)
+            return true;
+
+        QAState rhs = (QAState) obj;
+        return new EqualsBuilder().
+                append(hashCode(), rhs.hashCode()).
+                isEquals();
+    }
+
+
+    public Optional<String> popRandomAnswer(boolean isRandom) {
         int idx = isRandom ? rnd.nextInt(answers.size()) : 0;
         return Optional.ofNullable(answers.get(idx));
     }
