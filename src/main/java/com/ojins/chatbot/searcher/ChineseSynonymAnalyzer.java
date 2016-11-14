@@ -3,6 +3,7 @@ package com.ojins.chatbot.searcher;
 import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.cn.smart.HMMChineseTokenizer;
 import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
+import org.apache.lucene.analysis.en.EnglishMinimalStemFilter;
 import org.apache.lucene.analysis.en.PorterStemFilter;
 import org.apache.lucene.analysis.synonym.SynonymFilter;
 import org.apache.lucene.analysis.synonym.SynonymFilterFactory;
@@ -62,7 +63,7 @@ public class ChineseSynonymAnalyzer extends Analyzer{
 
     public Analyzer.TokenStreamComponents createComponents(String fieldName) {
         Tokenizer tokenizer = new IKTokenizer(true);
-        TokenStream result = new PorterStemFilter(tokenizer);
+        TokenStream result = new EnglishMinimalStemFilter(tokenizer);
         if(!this.stopWords.isEmpty()) {
             result = new StopFilter(result, this.stopWords);
         }
