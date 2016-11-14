@@ -28,6 +28,10 @@ public class QAState {
     private List<String> answers = new ArrayList<String>();
     private transient static Random rnd = new Random();
 
+    public QAState(List<String> questions, List<String> answers) {
+        this.questions = questions;
+        this.answers = answers;
+    }
 
 
     public List<String> getAnswers() {

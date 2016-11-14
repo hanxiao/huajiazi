@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Created by han on 11/14/16.
  */
-class StateIO {
+public class StateIO {
     private static transient final Logger LOG = LoggerFactory.getLogger(StateIO.class);
     private static Gson gson = new GsonBuilder()
             .registerTypeHierarchyAdapter(Collection.class, new CollectionAdapter()).create();
@@ -27,7 +27,7 @@ class StateIO {
         return gson.fromJson(content, setType);
     }
 
-    static void writeStatesToJson(Set<QAState> states, String fp) {
+    public static void writeStatesToJson(Set<QAState> states, String fp) {
         String jsonOutput = gson.toJson(states);
         writeToFile(new File(fp), jsonOutput);
     }
