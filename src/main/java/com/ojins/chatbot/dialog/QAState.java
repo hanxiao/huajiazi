@@ -26,7 +26,7 @@ public class QAState {
 
     private List<String> questions = new ArrayList<String>();
     private List<String> answers = new ArrayList<String>();
-    private Random rnd = new Random();
+    private transient static Random rnd = new Random();
 
 
 

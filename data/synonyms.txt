@@ -5,5 +5,6 @@ phd,博士生,博士
 德语,德文
 英语,英文
 uni,大学
-prof,professor,教授
+prof,professor,教授,导师,老师,boss
 过程,步骤,流程
+要求,考试,水平,资格,认证,级别,等级
