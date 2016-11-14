@@ -23,7 +23,7 @@ public class LuceneIndexer {
 
     private static transient final Logger LOG = LoggerFactory.getLogger(LuceneIndexer.class);
 
-    private Analyzer chineseAnalyzer = new SmartChineseAnalyzer();
+    private Analyzer chineseAnalyzer = new ChineseSynonymAnalyzer();
     private IndexWriterConfig config = new IndexWriterConfig(chineseAnalyzer);
     private Directory index = new RAMDirectory();
 
