@@ -18,7 +18,7 @@ public class testIndexer {
         luceneIndexer.index(qaStates);
 
         try {
-            luceneIndexer.search("我想问一下申请步骤是什么啊");
+            luceneIndexer.search("我硕士毕业了");
         } catch (Exception ex) {
             ex.printStackTrace();
         }

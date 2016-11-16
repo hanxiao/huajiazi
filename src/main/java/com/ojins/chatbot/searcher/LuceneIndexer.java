@@ -1,6 +1,9 @@
 package com.ojins.chatbot.searcher;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.ojins.chatbot.dialog.QAState;
+import com.ojins.chatbot.util.CollectionAdapter;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
 import org.apache.lucene.document.*;
@@ -22,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -34,6 +38,9 @@ public class LuceneIndexer {
     private Analyzer chineseAnalyzer = new ChineseSynonymAnalyzer();
     private IndexWriterConfig config = new IndexWriterConfig(chineseAnalyzer);
     private Directory index = new RAMDirectory();
+    private static Gson gson = new GsonBuilder()
+            .registerTypeHierarchyAdapter(Collection.class, new CollectionAdapter()).create();
+
 
     private static void indexQAState(IndexWriter w, QAState qaState) {
         // Each qastate is map to a set of docs. each of them has different question
@@ -42,7 +49,7 @@ public class LuceneIndexer {
         qaState.getQuestions().stream().forEach(p -> {
             Document doc = new Document();
             doc.add(new TextField("Question", p, Field.Store.NO));
-            doc.add(new StoredField("QAStateId", qaState.hashCode()));
+            doc.add(new StoredField("QAState", gson.toJson(qaState)));
             try {
                 w.addDocument(doc);
             } catch (IOException e) {
@@ -68,7 +75,7 @@ public class LuceneIndexer {
         TopDocs docs = searcher.search(q, hitsPerPage);
         ScoreDoc[] hits = docs.scoreDocs;
         for (ScoreDoc h : hits) {
-            LOG.info(String.format("id:%s\tscore:%s", searcher.doc(h.doc), h.score));
+            LOG.info(String.format("score:%s\tcontent:%s", searcher.doc(h.doc).get("QAState"), h.score));
         }
         reader.close();
     }
