@@ -26,6 +26,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -40,6 +42,8 @@ public class LuceneIndexer {
     private Directory index = new RAMDirectory();
     private static Gson gson = new GsonBuilder()
             .registerTypeHierarchyAdapter(Collection.class, new CollectionAdapter()).create();
+    private Map<Integer, QAState> qaStateMap = new HashMap<>();
+
 
 
     private static void indexQAState(IndexWriter w, QAState qaState) {
@@ -49,7 +53,7 @@ public class LuceneIndexer {
         qaState.getQuestions().stream().forEach(p -> {
             Document doc = new Document();
             doc.add(new TextField("Question", p, Field.Store.NO));
-            doc.add(new StoredField("QAState", gson.toJson(qaState)));
+            doc.add(new StoredField("QAState", qaState.hashCode()));
             try {
                 w.addDocument(doc);
             } catch (IOException e) {
@@ -62,21 +66,27 @@ public class LuceneIndexer {
         IndexWriter w = new IndexWriter(index, config);
         qaStates.stream().forEach(p-> {
             indexQAState(w, p);
+            qaStateMap.put(p.hashCode(), p);
         });
         w.close();
     }
 
-    public void search(String question) throws IOException, ParseException {
+    public Collection<String> search(String question) throws IOException, ParseException {
         Query q = new QueryParser("Question", chineseAnalyzer)
-                .parse("\""+ QueryParser.escape( question )+ "\"");
+                .parse(QueryParser.escape( question ));
         IndexReader reader = DirectoryReader.open(index);
         IndexSearcher searcher = new IndexSearcher(reader);
-        int hitsPerPage = 7;
+        int hitsPerPage = 5;
         TopDocs docs = searcher.search(q, hitsPerPage);
         ScoreDoc[] hits = docs.scoreDocs;
+        Map<Integer, String> answers = new HashMap<>();
         for (ScoreDoc h : hits) {
-            LOG.info(String.format("score:%s\tcontent:%s", searcher.doc(h.doc).get("QAState"), h.score));
+            int key = Integer.parseInt(searcher.doc(h.doc).get("QAState"));
+            if (!answers.containsKey(key)) {
+                answers.put(key, qaStateMap.get(key).popRandomAnswer(false).orElse("EMPTY"));
+            }
         }
         reader.close();
+        return answers.values();
     }
 }
