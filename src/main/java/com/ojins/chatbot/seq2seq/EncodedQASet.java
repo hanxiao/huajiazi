@@ -22,16 +22,25 @@ public class EncodedQASet {
 
     private static transient final Logger LOG = LoggerFactory.getLogger(EncodedQASet.class);
 
-    BiMap<String, Integer> word2idx = HashBiMap.create();
-    BiMap<Integer, String> idx2word;
+    private BiMap<String, Integer> word2idx = HashBiMap.create();
+    private BiMap<Integer, String> idx2word;
 
-    List<int[]> questions = new ArrayList<>();
-    List<int[]> answers = new ArrayList<>();
+    private List<int[]> questions = new ArrayList<>();
+    private List<int[]> answers = new ArrayList<>();
 
     private Analyzer analyzer = new ChineseSynonymAnalyzer(false, false);
     private int wIdx = 1; // 0 is reserved for SPACE/END
-    int maxQuestionLen = 0;
-    int maxAnswerLen = 0;
+
+    public int maxQuestionLen = 0;
+    public int maxAnswerLen = 0;
+
+    public int[] getAQuestion(int idx) {
+        return questions.get(idx);
+    }
+
+    public int[] getAnAnswer(int idx) {
+        return answers.get(idx);
+    }
 
     public int getVocabularySize() {
         return wIdx;
