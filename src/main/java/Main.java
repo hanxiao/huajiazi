@@ -22,7 +22,7 @@ public class Main {
     private static transient final Logger LOG = LoggerFactory.getLogger(Main.class);
 
     public static void main(final String[] args) throws IOException {
-        Analyzer analyzer = new ChineseSynonymAnalyzer(true);
+        Analyzer analyzer = new ChineseSynonymAnalyzer(true, true);
         TokenStream ts = analyzer.tokenStream("myfield", new StringReader("我想咨询一下关于德国博士申请的问题？"));
         HelperFunction.printTokenStream(ts);
     }

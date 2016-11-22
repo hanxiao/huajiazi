@@ -37,12 +37,12 @@ public class ChineseSynonymAnalyzer extends Analyzer{
     }
 
     public ChineseSynonymAnalyzer() {
-        this(true);
+        this(true, true);
     }
 
-    public ChineseSynonymAnalyzer(boolean useDefaultStopWords) {
+    public ChineseSynonymAnalyzer(boolean useDefaultStopWords, boolean useSynonym) {
         this.stopWords = useDefaultStopWords?ChineseSynonymAnalyzer.DefaultSetHolder.DEFAULT_STOP_SET:CharArraySet.EMPTY_SET;
-        initSynonymFilter();
+        if (useSynonym) initSynonymFilter();
     }
 
     private void initSynonymFilter() {
@@ -67,7 +67,9 @@ public class ChineseSynonymAnalyzer extends Analyzer{
         if(!this.stopWords.isEmpty()) {
             result = new StopFilter(result, this.stopWords);
         }
-        result = factory.create(result);
+        if (this.factory != null) {
+            result = factory.create(result);
+        }
 
         return new Analyzer.TokenStreamComponents(tokenizer, result);
     }

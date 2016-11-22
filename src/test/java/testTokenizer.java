@@ -13,7 +13,7 @@ public class testTokenizer {
 
     @Test
     public void testSomeInstances() {
-        Analyzer analyzer = new ChineseSynonymAnalyzer(true);
+        Analyzer analyzer = new ChineseSynonymAnalyzer(true, true);
 
         String[] sent = {"你好", "你好么",
                 "IK Analyzer是一个结合词典分词和文法分词的中文分词开源工具包。它使用了全新的正向迭代最细粒度切分算法。",
