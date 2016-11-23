@@ -5,6 +5,8 @@ import org.junit.Test;
 
 import java.io.FileNotFoundException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -18,5 +20,17 @@ public class testEncoder {
         encodedQASet.printSummary();
         System.out.println(Arrays.toString(encodedQASet.getEncodeSentence("德国博士咨询")));
         System.out.println(encodedQASet.getDecodeSentence(new int[] {47, 48, 75}));
+    }
+
+
+    @Test
+    public void testSample() {
+        Set<QAState> qaStates =  new HashSet<>();
+        qaStates.add(new QAState(Collections.singletonList("苹果好"), Collections.singletonList("橘子不好")));
+        qaStates.add(new QAState(Collections.singletonList("橘子好"), Collections.singletonList("苹果不好")));
+        qaStates.add(new QAState(Collections.singletonList("苹果不好"), Collections.singletonList("橘子好")));
+
+        EncodedQASet encodedQASet = new EncodedQASet(qaStates);
+        encodedQASet.printSummary();
     }
 }

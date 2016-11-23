@@ -30,12 +30,11 @@ public class QAIterator implements MultiDataSetIterator {
     private final int encoderSeqLength;
     private final int decoderSeqLength;
     private final int outputSeqLength;
-    private final int timestep;
     private final EncodedQASet encodedQASet;
 
     private final int SEQ_VECTOR_DIM;
 
-    public QAIterator(int seed, int batchSize, int totalBatches, EncodedQASet encodedQASet, int timestep) {
+    public QAIterator(int seed, int batchSize, int totalBatches, EncodedQASet encodedQASet) {
 
         this.seed = seed;
         this.randnumG = new Random(seed);
@@ -44,7 +43,6 @@ public class QAIterator implements MultiDataSetIterator {
         this.totalBatches = totalBatches;
 
         this.encodedQASet = encodedQASet;
-        this.timestep = timestep;
 
         this.SEQ_VECTOR_DIM = encodedQASet.getVocabularySize();
         this.encoderSeqLength = encodedQASet.maxQuestionLen;

@@ -46,7 +46,7 @@ public class AdditionRNN {
 
     //Tweak these to tune - dataset size = batchSize * totalBatches
     public static final int batchSize = 10;
-    public static final int totalBatches = 100;
+    public static final int totalBatches = 500;
     public static final int nEpochs = 50;
     public static final int nIterations = 1;
     public static final int numHiddenNodes = 128;
