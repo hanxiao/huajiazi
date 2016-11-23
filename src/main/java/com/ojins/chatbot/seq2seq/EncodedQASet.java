@@ -30,9 +30,14 @@ public class EncodedQASet {
 
     private Analyzer analyzer = new ChineseSynonymAnalyzer(false, false);
     private int wIdx = 1; // 0 is reserved for SPACE/END
+    public final int SPACE_OR_END = 0;
 
     public int maxQuestionLen = 0;
     public int maxAnswerLen = 0;
+
+    public int size() {
+        return questions.size();
+    }
 
     public int[] getAQuestion(int idx) {
         return questions.get(idx);
