@@ -17,11 +17,14 @@ public class testIndexer {
         LuceneIndexer luceneIndexer = new LuceneIndexer();
         luceneIndexer.index(qaStates);
 
-        String[] testQueries = {"面试一般要等多久会有结果啊", "你能给我讲讲申请的步骤么", "德国冬天冷么", "奖学金怎么申请啊"};
+        String[] testQueries = {"面试一般要等多久会有结果啊", "你能给我讲讲申请的步骤么", "冬天冷么", "奖学金怎么申请啊"};
         try {
             for (String q : testQueries) {
                 System.out.println("question:" + q);
-                System.out.println("answer:" + luceneIndexer.search(q).toArray()[0]);
+                luceneIndexer.search(q).stream().forEach(p->{
+                    System.out.println("answer:" + p);
+                });
+                System.out.println();
             }
         } catch (Exception ex) {
             ex.printStackTrace();

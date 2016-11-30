@@ -4,7 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ojins.chatbot.dialog.QAState;
 import com.ojins.chatbot.util.CollectionAdapter;
+import com.ojins.chatbot.util.HelperFunction;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
 import org.apache.lucene.document.*;
 import org.apache.lucene.index.DirectoryReader;
@@ -25,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +48,6 @@ public class LuceneIndexer {
     private Map<Integer, QAState> qaStateMap = new HashMap<>();
 
 
-
     private static void indexQAState(IndexWriter w, QAState qaState) {
         // Each qastate is map to a set of docs. each of them has different question
         // but they all have the same answer
@@ -64,7 +66,7 @@ public class LuceneIndexer {
 
     public void index(Set<QAState> qaStates) throws IOException {
         IndexWriter w = new IndexWriter(index, config);
-        qaStates.stream().forEach(p-> {
+        qaStates.stream().forEach(p -> {
             indexQAState(w, p);
             qaStateMap.put(p.hashCode(), p);
         });
@@ -72,8 +74,12 @@ public class LuceneIndexer {
     }
 
     public Collection<String> search(String question) throws IOException, ParseException {
+        TokenStream ts = chineseAnalyzer.tokenStream("myfield", new StringReader(question));
+        HelperFunction.printTokenStream(ts);
+
         Query q = new QueryParser("Question", chineseAnalyzer)
-                .parse(QueryParser.escape( question ));
+                .parse(QueryParser.escape(question));
+
         IndexReader reader = DirectoryReader.open(index);
         IndexSearcher searcher = new IndexSearcher(reader);
         int hitsPerPage = 5;
