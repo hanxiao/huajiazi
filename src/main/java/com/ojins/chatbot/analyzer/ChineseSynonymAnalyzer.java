@@ -1,4 +1,4 @@
-package com.ojins.chatbot.searcher;
+package com.ojins.chatbot.analyzer;
 
 import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.en.EnglishMinimalStemFilter;

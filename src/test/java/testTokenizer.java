@@ -1,4 +1,4 @@
-import com.ojins.chatbot.searcher.ChineseSynonymAnalyzer;
+import com.ojins.chatbot.analyzer.ChineseSynonymAnalyzer;
 import com.ojins.chatbot.util.HelperFunction;
 import org.apache.lucene.analysis.Analyzer;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package com.ojins.chatbot.searcher;
+package com.ojins.chatbot.service;
 
 import com.ojins.chatbot.util.HelperFunction;
 import org.apache.lucene.analysis.Analyzer;

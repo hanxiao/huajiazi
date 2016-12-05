@@ -1,9 +1,9 @@
 import com.ojins.chatbot.dialog.QAState;
 import com.ojins.chatbot.dialog.StateIO;
-import com.ojins.chatbot.searcher.LuceneIndexer;
-import com.ojins.chatbot.searcher.LuceneIndexerBuilder;
-import com.ojins.chatbot.searcher.LuceneReader;
-import com.ojins.chatbot.searcher.LuceneReaderBuilder;
+import com.ojins.chatbot.service.LuceneIndexer;
+import com.ojins.chatbot.service.LuceneIndexerBuilder;
+import com.ojins.chatbot.service.LuceneReader;
+import com.ojins.chatbot.service.LuceneReaderBuilder;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;

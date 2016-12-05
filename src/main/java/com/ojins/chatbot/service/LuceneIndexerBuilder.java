@@ -1,4 +1,4 @@
-package com.ojins.chatbot.searcher;
+package com.ojins.chatbot.service;
 
 import com.ojins.chatbot.dialog.QAState;
 import org.apache.lucene.store.Directory;

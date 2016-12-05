@@ -1,9 +1,7 @@
 import com.ojins.chatbot.dialog.QAState;
 import com.ojins.chatbot.dialog.StateIO;
-import com.ojins.chatbot.searcher.LuceneReader;
-import com.ojins.chatbot.searcher.LuceneReaderBuilder;
-import com.ojins.chatbot.searcher.QAService;
-import com.ojins.chatbot.searcher.QAServiceBuilder;
+import com.ojins.chatbot.service.QAService;
+import com.ojins.chatbot.service.QAServiceBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 

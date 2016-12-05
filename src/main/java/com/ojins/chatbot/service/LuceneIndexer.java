@@ -1,7 +1,8 @@
-package com.ojins.chatbot.searcher;
+package com.ojins.chatbot.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.ojins.chatbot.analyzer.ChineseSynonymAnalyzer;
 import com.ojins.chatbot.dialog.QAState;
 import com.ojins.chatbot.util.CollectionAdapter;
 import org.apache.lucene.analysis.Analyzer;

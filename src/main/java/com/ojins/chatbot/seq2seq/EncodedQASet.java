@@ -2,8 +2,8 @@ package com.ojins.chatbot.seq2seq;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.ojins.chatbot.analyzer.ChineseSynonymAnalyzer;
 import com.ojins.chatbot.dialog.QAState;
-import com.ojins.chatbot.searcher.ChineseSynonymAnalyzer;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
