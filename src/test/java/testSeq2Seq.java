@@ -1,5 +1,4 @@
 import com.ojins.chatbot.dialog.QAState;
-import com.ojins.chatbot.seq2seq.CustomSequenceIterator;
 import com.ojins.chatbot.seq2seq.EncodedQASet;
 import com.ojins.chatbot.seq2seq.QAIterator;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;

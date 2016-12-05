@@ -1,4 +1,3 @@
-import com.google.common.annotations.VisibleForTesting;
 import com.ojins.chatbot.dialog.QAState;
 import com.ojins.chatbot.dialog.StateIO;
 import org.junit.Assert;

@@ -1,23 +1,14 @@
 package com.ojins.chatbot.searcher;
 
 import org.apache.lucene.analysis.*;
-import org.apache.lucene.analysis.cn.smart.HMMChineseTokenizer;
-import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
 import org.apache.lucene.analysis.en.EnglishMinimalStemFilter;
-import org.apache.lucene.analysis.en.PorterStemFilter;
-import org.apache.lucene.analysis.synonym.SynonymFilter;
 import org.apache.lucene.analysis.synonym.SynonymFilterFactory;
 import org.apache.lucene.analysis.util.FilesystemResourceLoader;
-import org.apache.lucene.util.IOUtils;
 import org.apache.lucene.util.Version;
-import org.wltea.analyzer.cfg.Configuration;
-import org.wltea.analyzer.cfg.DefaultConfig;
 import org.wltea.analyzer.lucene.IKTokenizer;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
