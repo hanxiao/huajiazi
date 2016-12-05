@@ -37,7 +37,6 @@ public class LuceneIndexer {
     }
 
     private Analyzer chineseAnalyzer = new ChineseSynonymAnalyzer();
-    private IndexWriterConfig config = new IndexWriterConfig(chineseAnalyzer);
     private Directory index;
     private static Gson gson = new GsonBuilder()
             .registerTypeHierarchyAdapter(Collection.class, new CollectionAdapter()).create();
@@ -70,7 +69,7 @@ public class LuceneIndexer {
 
     public void addManyQAState(Set<QAState> qaStates, boolean append) throws IOException {
         if (qaStates.isEmpty()) return;
-        IndexWriter w = new IndexWriter(index, config);
+        IndexWriter w = new IndexWriter(index, new IndexWriterConfig(chineseAnalyzer));
         if (!append) {
             w.deleteAll();
             w.commit();
