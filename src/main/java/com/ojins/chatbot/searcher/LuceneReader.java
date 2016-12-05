@@ -56,4 +56,9 @@ public class LuceneReader {
         reader.close();
         return answers;
     }
+
+    public int getNumDocs() throws IOException {
+        IndexReader reader = DirectoryReader.open(index);
+        return reader.numDocs();
+    }
 }
