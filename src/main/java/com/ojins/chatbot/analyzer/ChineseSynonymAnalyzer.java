@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * Created by han on 11/14/16.
  */
-public class ChineseSynonymAnalyzer extends Analyzer{
+public class ChineseSynonymAnalyzer extends Analyzer {
     private final CharArraySet stopWords;
     private static final String DEFAULT_STOPWORD_FILE = "data/stopwords.txt";
     private static final String STOPWORD_FILE_COMMENT = "//";
@@ -32,7 +32,7 @@ public class ChineseSynonymAnalyzer extends Analyzer{
     }
 
     public ChineseSynonymAnalyzer(boolean useDefaultStopWords, boolean useSynonym) {
-        this.stopWords = useDefaultStopWords?ChineseSynonymAnalyzer.DefaultSetHolder.DEFAULT_STOP_SET:CharArraySet.EMPTY_SET;
+        this.stopWords = useDefaultStopWords ? ChineseSynonymAnalyzer.DefaultSetHolder.DEFAULT_STOP_SET : CharArraySet.EMPTY_SET;
         if (useSynonym) initSynonymFilter();
     }
 
@@ -49,13 +49,13 @@ public class ChineseSynonymAnalyzer extends Analyzer{
     }
 
     public ChineseSynonymAnalyzer(CharArraySet stopWords) {
-        this.stopWords = stopWords == null?CharArraySet.EMPTY_SET:stopWords;
+        this.stopWords = stopWords == null ? CharArraySet.EMPTY_SET : stopWords;
     }
 
     public Analyzer.TokenStreamComponents createComponents(String fieldName) {
         Tokenizer tokenizer = new IKTokenizer(true);
         TokenStream result = new EnglishMinimalStemFilter(tokenizer);
-        if(!this.stopWords.isEmpty()) {
+        if (!this.stopWords.isEmpty()) {
             result = new StopFilter(result, this.stopWords);
         }
         if (this.factory != null) {

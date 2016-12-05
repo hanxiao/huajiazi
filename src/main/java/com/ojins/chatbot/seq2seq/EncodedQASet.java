@@ -68,10 +68,10 @@ public class EncodedQASet {
         // first build dictionary
         qaStates.stream().forEach(p -> {
             try {
-                for (String q: p.getQuestions()) {
+                for (String q : p.getQuestions()) {
                     int[] q_idx = EncodeSentence(q, true).stream().mapToInt(i -> i).toArray();
                     maxQuestionLen = maxQuestionLen > q_idx.length ? maxQuestionLen : q_idx.length;
-                    for (String a: p.getAnswers()) {
+                    for (String a : p.getAnswers()) {
                         int[] a_idx = EncodeSentence(a, true).stream().mapToInt(i -> i).toArray();
                         maxAnswerLen = maxAnswerLen > a_idx.length ? maxAnswerLen : a_idx.length;
                         questions.add(q_idx);
@@ -90,7 +90,7 @@ public class EncodedQASet {
     public int[] getEncodeSentence(String s) {
         try {
             return EncodeSentence(s, false).stream().mapToInt(i -> i).toArray();
-        } catch (IOException|NoSuchElementException ex) {
+        } catch (IOException | NoSuchElementException ex) {
             ex.printStackTrace();
             return null;
         }
@@ -121,7 +121,7 @@ public class EncodedQASet {
                 if (add2Dict && !word2idx.containsKey(curWord)) {
                     word2idx.put(termAtt.toString(), wIdx);
                     curIdx = wIdx;
-                    wIdx ++;
+                    wIdx++;
                 }
                 if (curIdx >= 0) {
                     encodedSent.add(curIdx);

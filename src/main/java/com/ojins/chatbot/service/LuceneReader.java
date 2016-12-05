@@ -1,5 +1,8 @@
 package com.ojins.chatbot.service;
 
+import com.ojins.chatbot.dialog.QAResult;
+import com.ojins.chatbot.dialog.QAResultBuilder;
+import com.ojins.chatbot.dialog.QAScoreTuple;
 import com.ojins.chatbot.util.HelperFunction;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
@@ -17,9 +20,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Created by han on 12/5/16.
@@ -37,7 +42,7 @@ public class LuceneReader {
         this.numAnswer = numAnswer;
     }
 
-    public Collection<String> getAnswers(String question) throws IOException, ParseException {
+    public Optional<QAResult> getAnswers(String question) throws IOException, ParseException {
         TokenStream ts = chineseAnalyzer.tokenStream("myfield", new StringReader(question));
         HelperFunction.printTokenStream(ts);
 
@@ -49,12 +54,38 @@ public class LuceneReader {
 
         TopDocs docs = searcher.search(q, numAnswer);
         ScoreDoc[] hits = docs.scoreDocs;
-        Set<String> answers = new HashSet<>();
+        Map<String, QAScoreTuple> answers = new HashMap<>();
         for (ScoreDoc h : hits) {
-            answers.add(searcher.doc(h.doc).get("Answer"));
+            String curAnswer = searcher.doc(h.doc).get("Answer");
+            String curQuestion = searcher.doc(h.doc).get("Question");
+            if (answers.containsKey(curAnswer)) {
+                answers.get(curAnswer).score += h.score;
+                answers.get(curAnswer).hits++;
+            } else {
+                answers.putIfAbsent(curAnswer, new QAScoreTuple(curQuestion, curAnswer, h.score, 1));
+            }
         }
         reader.close();
-        return answers;
+
+        if (answers.size() == 0) {
+            return Optional.empty();
+        }
+
+        answers.values().stream().forEach(p -> {
+            p.score = p.score / p.hits;
+        });
+
+        Optional<QAScoreTuple> bestAnswer = answers.values().stream().max(Comparator.comparingDouble(QAScoreTuple::getScore));
+        answers.remove(bestAnswer.get().answer);
+        Stream<String> tmp = answers.values().stream().map(p -> p.question);
+        String[] didYouMean = tmp.toArray(String[]::new);
+
+        return Optional.of(new QAResultBuilder()
+                .setAnswer(bestAnswer.get().answer)
+                .setQuestion(bestAnswer.get().question)
+                .setDidYouMean(didYouMean)
+                .setScore(bestAnswer.get().score)
+                .createQAResult());
     }
 
     public int getNumDocs() throws IOException {

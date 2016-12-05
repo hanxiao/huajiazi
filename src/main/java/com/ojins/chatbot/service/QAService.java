@@ -1,13 +1,19 @@
 package com.ojins.chatbot.service;
 
+import com.ojins.chatbot.dialog.QAResult;
 import com.ojins.chatbot.dialog.QAState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -20,13 +26,16 @@ public class QAService {
 
     private static transient final Logger LOG = LoggerFactory.getLogger(LuceneReader.class);
 
-    public QAService(Set<QAState> qaStates, String topic) {
+    public QAService(Set<QAState> qaStates, String topic, boolean overwrite) {
         curTopic = topic;
         Path fp = Paths.get("index", topic);
 
-        if (!Files.exists(fp) || !qaStates.isEmpty()) {
-            LOG.info(String.format("topic: %s does not exist, will create a new one", topic));
-
+        if (!Files.exists(fp) || overwrite) {
+            if (Files.exists(fp) && overwrite) {
+                LOG.info(String.format("topic: %s already exists, but I will overwrite it", topic));
+            } else if (!Files.exists(fp)) {
+                LOG.info(String.format("topic: %s not exists, I will create it", topic));
+            }
             luceneIndexer = new LuceneIndexerBuilder()
                     .setFilePath(fp.toString())
                     .setQAStates(qaStates)
@@ -54,8 +63,31 @@ public class QAService {
         }
     }
 
-    public void addQAPair(String question, String answer) {
+    public static String[] getAvailableTopics() {
+        File file = new File("index/");
+        return file.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File current, String name) {
+                return new File(current, name).isDirectory();
+            }
+        });
+    }
 
+    public static Optional<QAService> selectTopic(String topic) {
+        if (new HashSet<>(Arrays.asList(getAvailableTopics())).contains(topic)) {
+            return Optional.of(new QAServiceBuilder().setTopic(topic).createQAService());
+        } else {
+            LOG.warn(String.format("Do not support topic %s", topic));
+            return Optional.empty();
+        }
+    }
+
+    public QAResult getAnswer(String question) {
+        return null;
+    }
+
+    public boolean addQAPair(String question, String answer) {
+        return luceneIndexer.addQAState(new QAState(question, answer));
     }
 
     public void printServiceInfo() {

@@ -1,3 +1,4 @@
+import com.ojins.chatbot.dialog.QAResult;
 import com.ojins.chatbot.dialog.QAState;
 import com.ojins.chatbot.dialog.StateIO;
 import com.ojins.chatbot.service.LuceneIndexer;
@@ -8,6 +9,8 @@ import org.junit.Test;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -36,10 +39,11 @@ public class testIndexer {
     }
 
     @Test
-    public void testAdding() throws IOException {
+    public void testAdding() {
         luceneIndexer.addQAState(new QAState("世界上最伟大的国家是哪个国家", "中国"));
         getAnswerForQuestions(luceneReader, "谁是世界上最伟大的国家");
     }
+
 
     @Test
     public void testUpdating() throws IOException {
@@ -53,10 +57,13 @@ public class testIndexer {
     public static void getAnswerForQuestions(LuceneReader luceneReader, String[] testQueries) {
         try {
             for (String q : testQueries) {
-                System.out.println("question:" + q);
-                luceneReader.getAnswers(q).forEach(p -> {
-                    System.out.println("answer:" + p);
-                });
+                System.out.println("+ Question:" + q);
+                Optional<QAResult> tmp = luceneReader.getAnswers(q);
+                if (tmp.isPresent()) {
+                    System.out.println("+ Answer:" + tmp.get().getAnswer());
+                    System.out.println("+ Score:" + tmp.get().getScore());
+                    System.out.println("+ Did you mean:" + Arrays.toString(tmp.get().getDidYouMean()));
+                }
                 System.out.println();
             }
         } catch (Exception ex) {

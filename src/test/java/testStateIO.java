@@ -15,7 +15,7 @@ public class testStateIO {
 
     @Test
     public void testWrite() {
-        Set<QAState> qaStates =  new HashSet<>();
+        Set<QAState> qaStates = new HashSet<>();
         qaStates.add(new QAState(Arrays.asList("q1", "q2"), Arrays.asList("a1", "a2")));
 
         StateIO.writeStatesToJson(qaStates, "statedb-test.json");

@@ -32,7 +32,7 @@ import java.util.Set;
 public class testSeq2Seq {
     @Test
     public void testToyTraining() {
-        Set<QAState> qaStates =  new HashSet<>();
+        Set<QAState> qaStates = new HashSet<>();
         qaStates.add(new QAState(Collections.singletonList("苹果好"), Collections.singletonList("橘子不好")));
         qaStates.add(new QAState(Collections.singletonList("橘子好"), Collections.singletonList("苹果不好")));
         qaStates.add(new QAState(Collections.singletonList("苹果不好"), Collections.singletonList("橘子好")));
@@ -64,10 +64,10 @@ public class testSeq2Seq {
                 .graphBuilder()
                 .addInputs("additionIn", "sumOut")
                 .setInputTypes(InputType.recurrent(FEATURE_VEC_SIZE), InputType.recurrent(FEATURE_VEC_SIZE))
-                .addLayer("encoder", new GravesLSTM.Builder().nIn(FEATURE_VEC_SIZE).nOut(numHiddenNodes).activation("softsign").build(),"additionIn")
+                .addLayer("encoder", new GravesLSTM.Builder().nIn(FEATURE_VEC_SIZE).nOut(numHiddenNodes).activation("softsign").build(), "additionIn")
                 .addVertex("lastTimeStep", new LastTimeStepVertex("additionIn"), "encoder")
                 .addVertex("duplicateTimeStep", new DuplicateToTimeSeriesVertex("sumOut"), "lastTimeStep")
-                .addLayer("decoder", new GravesLSTM.Builder().nIn(FEATURE_VEC_SIZE+numHiddenNodes).nOut(numHiddenNodes).activation("softsign").build(), "sumOut","duplicateTimeStep")
+                .addLayer("decoder", new GravesLSTM.Builder().nIn(FEATURE_VEC_SIZE + numHiddenNodes).nOut(numHiddenNodes).activation("softsign").build(), "sumOut", "duplicateTimeStep")
                 .addLayer("output", new RnnOutputLayer.Builder().nIn(numHiddenNodes).nOut(FEATURE_VEC_SIZE).activation("softmax").lossFunction(LossFunctions.LossFunction.MCXENT).build(), "decoder")
                 .setOutputs("output")
                 .pretrain(false).backprop(true)
@@ -82,21 +82,21 @@ public class testSeq2Seq {
         int iEpoch = 0;
         int testSize = 4;
         while (iEpoch < nEpochs) {
-            System.out.printf("* = * = * = * = * = * = * = * = * = ** EPOCH %d ** = * = * = * = * = * = * = * = * = * = * = * = * = * =\n",iEpoch);
+            System.out.printf("* = * = * = * = * = * = * = * = * = ** EPOCH %d ** = * = * = * = * = * = * = * = * = * = * = * = * = * =\n", iEpoch);
             net.fit(iterator);
 
             MultiDataSet testData = iterator.generateTest(testSize);
             ArrayList<int[]> testNums = iterator.testFeatures();
-            INDArray[] prediction_array = net.output(new INDArray[]{testData.getFeatures(0),testData.getFeatures(1)});
+            INDArray[] prediction_array = net.output(new INDArray[]{testData.getFeatures(0), testData.getFeatures(1)});
             INDArray predictions = prediction_array[0];
-            INDArray answers = Nd4j.argMax(predictions,1);
+            INDArray answers = Nd4j.argMax(predictions, 1);
 //
 //            encode_decode(testnum1,testnum2,testSums,answers);
 
             iterator.reset();
             iEpoch++;
         }
-        System.out.printf("\n* = * = * = * = * = * = * = * = * = ** EPOCH COMPLETE ** = * = * = * = * = * = * = * = * = * = * = * = * = * =\n",iEpoch);
+        System.out.printf("\n* = * = * = * = * = * = * = * = * = ** EPOCH COMPLETE ** = * = * = * = * = * = * = * = * = * = * = * = * = * =\n", iEpoch);
 
     }
 }

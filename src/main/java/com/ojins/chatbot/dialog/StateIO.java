@@ -23,7 +23,8 @@ public class StateIO {
 
     public static Set<QAState> loadStatesFromJson(String fp) throws FileNotFoundException {
         String content = new Scanner(new File(fp)).useDelimiter("\\Z").next();
-        Type setType = new TypeToken<Set<QAState>>() {}.getType();
+        Type setType = new TypeToken<Set<QAState>>() {
+        }.getType();
         return gson.fromJson(content, setType);
     }
 

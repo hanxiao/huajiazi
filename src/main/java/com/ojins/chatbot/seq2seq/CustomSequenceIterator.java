@@ -20,9 +20,9 @@ public class CustomSequenceIterator implements MultiDataSetIterator {
 
     private Random randnumG;
     private int currentBatch;
-    private int [] num1Arr;
-    private int [] num2Arr;
-    private int [] sumArr;
+    private int[] num1Arr;
+    private int[] num2Arr;
+    private int[] sumArr;
     private boolean toTestSet;
     private final int seed;
     private final int batchSize;
@@ -35,7 +35,7 @@ public class CustomSequenceIterator implements MultiDataSetIterator {
 
     private static final int SEQ_VECTOR_DIM = 12;
 
-    public CustomSequenceIterator (int seed, int batchSize, int totalBatches, int numdigits, int timestep) {
+    public CustomSequenceIterator(int seed, int batchSize, int totalBatches, int numdigits, int timestep) {
 
         this.seed = seed;
         this.randnumG = new Random(seed);
@@ -52,20 +52,24 @@ public class CustomSequenceIterator implements MultiDataSetIterator {
 
         this.currentBatch = 0;
     }
+
     public MultiDataSet generateTest(int testSize) {
         toTestSet = true;
         MultiDataSet testData = next(testSize);
         return testData;
     }
-    public ArrayList<int[]> testFeatures (){
+
+    public ArrayList<int[]> testFeatures() {
         ArrayList<int[]> testNums = new ArrayList<int[]>();
         testNums.add(num1Arr);
         testNums.add(num2Arr);
         return testNums;
     }
-    public int[] testLabels (){
+
+    public int[] testLabels() {
         return sumArr;
     }
+
     @Override
     public MultiDataSet next(int sampleSize) {
         /* PLEASE NOTE:
@@ -73,9 +77,9 @@ public class CustomSequenceIterator implements MultiDataSetIterator {
             Enhancement, to be fixed later
          */
         //Initialize everything with zeros - will eventually fill with one hot vectors
-        INDArray encoderSeq = Nd4j.zeros(sampleSize, SEQ_VECTOR_DIM, encoderSeqLength );
-        INDArray decoderSeq = Nd4j.zeros(sampleSize, SEQ_VECTOR_DIM, decoderSeqLength );
-        INDArray outputSeq = Nd4j.zeros(sampleSize, SEQ_VECTOR_DIM, outputSeqLength );
+        INDArray encoderSeq = Nd4j.zeros(sampleSize, SEQ_VECTOR_DIM, encoderSeqLength);
+        INDArray decoderSeq = Nd4j.zeros(sampleSize, SEQ_VECTOR_DIM, decoderSeqLength);
+        INDArray outputSeq = Nd4j.zeros(sampleSize, SEQ_VECTOR_DIM, outputSeqLength);
 
         //Since these are fixed length sequences of timestep
         //Masks are not required
@@ -84,16 +88,16 @@ public class CustomSequenceIterator implements MultiDataSetIterator {
         INDArray outputMask = Nd4j.ones(sampleSize, outputSeqLength);
 
         if (toTestSet) {
-            num1Arr = new int [sampleSize];
-            num2Arr = new int [sampleSize];
-            sumArr = new int [sampleSize];
+            num1Arr = new int[sampleSize];
+            num2Arr = new int[sampleSize];
+            sumArr = new int[sampleSize];
         }
 
         /* ========================================================================== */
         for (int iSample = 0; iSample < sampleSize; iSample++) {
             //Generate two random numbers with numdigits
-            int num1 = randnumG.nextInt((int)Math.pow(10,numdigits));
-            int num2 = randnumG.nextInt((int)Math.pow(10,numdigits));
+            int num1 = randnumG.nextInt((int) Math.pow(10, numdigits));
+            int num2 = randnumG.nextInt((int) Math.pow(10, numdigits));
             int sum = num1 + num2;
             if (toTestSet) {
                 num1Arr[iSample] = num1;
@@ -115,26 +119,26 @@ public class CustomSequenceIterator implements MultiDataSetIterator {
             //Fill in spaces, as necessary
             while (spaceFill > 0) {
                 //spaces encoded at addManyQAState 12
-                encoderSeq.putScalar(new int[] {iSample,11,iPos},1);
+                encoderSeq.putScalar(new int[]{iSample, 11, iPos}, 1);
                 iPos++;
                 spaceFill--;
             }
 
             //Fill in the digits in num2 backwards
             String num2Str = String.valueOf(num2);
-            for(int i = num2Str.length()-1; i >= 0; i--){
+            for (int i = num2Str.length() - 1; i >= 0; i--) {
                 int onehot = Character.getNumericValue(num2Str.charAt(i));
-                encoderSeq.putScalar(new int[] {iSample,onehot,iPos},1);
+                encoderSeq.putScalar(new int[]{iSample, onehot, iPos}, 1);
                 iPos++;
             }
             //Fill in operator in this case "+", encoded at addManyQAState 11
-            encoderSeq.putScalar(new int [] {iSample,10,iPos},1);
+            encoderSeq.putScalar(new int[]{iSample, 10, iPos}, 1);
             iPos++;
             //Fill in the digits in num1 backwards
             String num1Str = String.valueOf(num1);
-            for(int i = num1Str.length()-1; i >= 0; i--){
+            for (int i = num1Str.length() - 1; i >= 0; i--) {
                 int onehot = Character.getNumericValue(num1Str.charAt(i));
-                encoderSeq.putScalar(new int[] {iSample,onehot,iPos},1);
+                encoderSeq.putScalar(new int[]{iSample, onehot, iPos}, 1);
                 iPos++;
             }
             //Mask input for rest of the time series
@@ -147,26 +151,26 @@ public class CustomSequenceIterator implements MultiDataSetIterator {
             */
             //Fill in the digits from the sum
             iPos = 0;
-            char [] sumCharArr = String.valueOf(num1+num2).toCharArray();
-            for(char c : sumCharArr) {
+            char[] sumCharArr = String.valueOf(num1 + num2).toCharArray();
+            for (char c : sumCharArr) {
                 int digit = Character.getNumericValue(c);
-                outputSeq.putScalar(new int [] {iSample,digit,iPos},1);
+                outputSeq.putScalar(new int[]{iSample, digit, iPos}, 1);
                 //decoder input filled with spaces
-                decoderSeq.putScalar(new int [] {iSample,11,iPos},1);
+                decoderSeq.putScalar(new int[]{iSample, 11, iPos}, 1);
                 iPos++;
             }
             //Fill in spaces, as necessary
             //Leaves last addManyQAState for "."
             while (iPos < numdigits + 1) {
                 //spaces encoded at addManyQAState 12
-                outputSeq.putScalar(new int [] {iSample,11,iPos}, 1);
+                outputSeq.putScalar(new int[]{iSample, 11, iPos}, 1);
                 //decoder input filled with spaces
-                decoderSeq.putScalar(new int [] {iSample,11,iPos},1);
+                decoderSeq.putScalar(new int[]{iSample, 11, iPos}, 1);
                 iPos++;
             }
             //Predict final " "
-            outputSeq.putScalar(new int [] {iSample,10,iPos}, 1);
-            decoderSeq.putScalar(new int [] {iSample,11,iPos}, 1);
+            outputSeq.putScalar(new int[]{iSample, 10, iPos}, 1);
+            decoderSeq.putScalar(new int[]{iSample, 11, iPos}, 1);
         }
         //Predict "."
         /* ========================================================================== */
@@ -209,6 +213,7 @@ public class CustomSequenceIterator implements MultiDataSetIterator {
     public void remove() {
         throw new UnsupportedOperationException("Not supported");
     }
+
     public void setPreProcessor(MultiDataSetPreProcessor multiDataSetPreProcessor) {
 
     }

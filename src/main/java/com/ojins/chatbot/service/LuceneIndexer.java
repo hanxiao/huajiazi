@@ -8,7 +8,6 @@ import com.ojins.chatbot.util.CollectionAdapter;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -58,8 +57,8 @@ public class LuceneIndexer {
         // consider each doc as a emission path, they all lead to the same state.
         qaState.getQuestions().forEach(p -> {
             Document doc = new Document();
-            doc.add(new TextField("Question", p, Field.Store.NO));
-            doc.add(new StoredField("Answer", qaState.getAnswers().get(0)));
+            doc.add(new TextField("Question", p, Field.Store.YES));
+            doc.add(new TextField("Answer", qaState.getAnswers().get(0), Field.Store.YES));
             try {
                 w.addDocument(doc);
             } catch (IOException e) {
@@ -81,7 +80,14 @@ public class LuceneIndexer {
         w.close();
     }
 
-    public void addQAState(QAState qaState) throws IOException {
-        addManyQAState(new HashSet<>(Collections.singletonList(qaState)), true);
+    public boolean addQAState(QAState qaState) {
+        try {
+            addManyQAState(new HashSet<>(Collections.singletonList(qaState)), true);
+            return true;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            LOG.error("Something wrong when adding QAState");
+            return false;
+        }
     }
 }
