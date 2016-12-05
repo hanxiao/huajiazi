@@ -36,7 +36,7 @@ public class LuceneIndexerBuilder {
         return this;
     }
 
-    public LuceneIndexer build() {
+    public LuceneIndexer createLuceneIndexer() {
         return new LuceneIndexer(index, qaStates);
     }
 

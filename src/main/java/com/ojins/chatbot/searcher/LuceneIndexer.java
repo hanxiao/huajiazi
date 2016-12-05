@@ -34,17 +34,24 @@ public class LuceneIndexer {
 
     private static transient final Logger LOG = LoggerFactory.getLogger(LuceneIndexer.class);
 
+    public Analyzer getChineseAnalyzer() {
+        return chineseAnalyzer;
+    }
+
+    public Directory getIndex() {
+        return index;
+    }
+
     private Analyzer chineseAnalyzer = new ChineseSynonymAnalyzer();
     private IndexWriterConfig config = new IndexWriterConfig(chineseAnalyzer);
     private Directory index;
     private static Gson gson = new GsonBuilder()
             .registerTypeHierarchyAdapter(Collection.class, new CollectionAdapter()).create();
-    private Map<Integer, QAState> qaStateMap = new HashMap<>();
 
     public LuceneIndexer(Directory index, Set<QAState> qaStates) {
         this.index = index;
         try {
-            addManyQAState(qaStates);
+            addManyQAState(qaStates, false);
         } catch (IOException ex) {
             ex.printStackTrace();
             LOG.error("something wrong when adding QAState");
@@ -58,7 +65,7 @@ public class LuceneIndexer {
         qaState.getQuestions().forEach(p -> {
             Document doc = new Document();
             doc.add(new TextField("Question", p, Field.Store.NO));
-            doc.add(new StoredField("QAState", qaState.hashCode()));
+            doc.add(new StoredField("Answer", qaState.getAnswers().get(0)));
             try {
                 w.addDocument(doc);
             } catch (IOException e) {
@@ -67,39 +74,20 @@ public class LuceneIndexer {
         });
     }
 
-    public void addManyQAState(Set<QAState> qaStates) throws IOException {
+    public void addManyQAState(Set<QAState> qaStates, boolean append) throws IOException {
+        if (qaStates.isEmpty()) return;
         IndexWriter w = new IndexWriter(index, config);
+        if (!append) {
+            w.deleteAll();
+            w.commit();
+        }
         qaStates.forEach(p -> {
             indexQAState(w, p);
-            qaStateMap.put(p.hashCode(), p);
         });
         w.close();
     }
 
     public void addQAState(QAState qaState) throws IOException {
-        addManyQAState(new HashSet<>(Collections.singletonList(qaState)));
-    }
-
-    public Collection<String> search(String question) throws IOException, ParseException {
-        TokenStream ts = chineseAnalyzer.tokenStream("myfield", new StringReader(question));
-        HelperFunction.printTokenStream(ts);
-
-        Query q = new QueryParser("Question", chineseAnalyzer)
-                .parse(QueryParser.escape(question));
-
-        IndexReader reader = DirectoryReader.open(index);
-        IndexSearcher searcher = new IndexSearcher(reader);
-        int hitsPerPage = 5;
-        TopDocs docs = searcher.search(q, hitsPerPage);
-        ScoreDoc[] hits = docs.scoreDocs;
-        Map<Integer, String> answers = new HashMap<>();
-        for (ScoreDoc h : hits) {
-            int key = Integer.parseInt(searcher.doc(h.doc).get("QAState"));
-            if (!answers.containsKey(key)) {
-                answers.put(key, qaStateMap.get(key).popRandomAnswer(false).orElse("EMPTY"));
-            }
-        }
-        reader.close();
-        return answers.values();
+        addManyQAState(new HashSet<>(Collections.singletonList(qaState)), true);
     }
 }
