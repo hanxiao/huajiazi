@@ -22,6 +22,7 @@ public class testService {
         qaService = new QAServiceBuilder()
                 .setQAStates(qaStates)
                 .setTopic("phd")
+                .setOverwrite(true)
                 .createQAService();
 
         qaService.addQAPair("这是什么主题的数据库?", "博士申请");
@@ -29,9 +30,19 @@ public class testService {
         qaService = new QAServiceBuilder()
                 .setQAStates(qaStates)
                 .setTopic("quant")
+                .setOverwrite(true)
                 .createQAService();
 
         qaService.addQAPair("这是什么主题的数据库?", "量化交易");
+    }
+
+    @Test
+    public void testSwitchTopic() {
+        Assert.assertEquals(qaService.getAnswer("这是什么主题数据库?").get().getAnswer(), "量化交易");
+        qaService = QAService.selectTopic("phd").orElse(null);
+        if (qaService != null) {
+            Assert.assertEquals(qaService.getAnswer("这是什么主题数据库?").get().getAnswer(), "博士申请");
+        }
     }
 
     @Test

@@ -82,8 +82,13 @@ public class QAService {
         }
     }
 
-    public QAResult getAnswer(String question) {
-        return null;
+    public Optional<QAResult> getAnswer(String question) {
+        try {
+            return luceneReader.getAnswers(question);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Optional.empty();
+        }
     }
 
     public boolean addQAPair(String question, String answer) {

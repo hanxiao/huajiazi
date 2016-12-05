@@ -57,17 +57,24 @@ public class testIndexer {
     public static void getAnswerForQuestions(LuceneReader luceneReader, String[] testQueries) {
         try {
             for (String q : testQueries) {
-                System.out.println("+ Question:" + q);
                 Optional<QAResult> tmp = luceneReader.getAnswers(q);
                 if (tmp.isPresent()) {
-                    System.out.println("+ Answer:" + tmp.get().getAnswer());
-                    System.out.println("+ Score:" + tmp.get().getScore());
-                    System.out.println("+ Did you mean:" + Arrays.toString(tmp.get().getDidYouMean()));
+                    printQAResult(tmp.get());
+                } else {
+                    System.out.println(String.format("question: %s has no answer!", q));
                 }
                 System.out.println();
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    public static void printQAResult(QAResult tmp) {
+        System.out.println("+ Question:" + tmp.getQuestion());
+        System.out.println("+ Answer:" + tmp.getAnswer());
+        System.out.println("+ Score:" + tmp.getScore());
+        System.out.println("+ Did you mean:" + Arrays.toString(tmp.getDidYouMean()));
+
     }
 }
