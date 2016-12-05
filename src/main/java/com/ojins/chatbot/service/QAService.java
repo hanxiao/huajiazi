@@ -54,6 +54,10 @@ public class QAService {
         }
     }
 
+    public void addQAPair(String question, String answer) {
+
+    }
+
     public void printServiceInfo() {
         try {
             LOG.info(String.format(
