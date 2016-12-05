@@ -7,7 +7,6 @@ import com.ojins.chatbot.util.CollectionAdapter;
 import com.ojins.chatbot.util.HelperFunction;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
 import org.apache.lucene.document.*;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -24,14 +23,9 @@ import org.apache.lucene.store.RAMDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by han on 11/13/16.
@@ -42,17 +36,26 @@ public class LuceneIndexer {
 
     private Analyzer chineseAnalyzer = new ChineseSynonymAnalyzer();
     private IndexWriterConfig config = new IndexWriterConfig(chineseAnalyzer);
-    private Directory index = new RAMDirectory();
+    private Directory index;
     private static Gson gson = new GsonBuilder()
             .registerTypeHierarchyAdapter(Collection.class, new CollectionAdapter()).create();
     private Map<Integer, QAState> qaStateMap = new HashMap<>();
 
+    public LuceneIndexer(Directory index, Set<QAState> qaStates) {
+        this.index = index;
+        try {
+            addManyQAState(qaStates);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            LOG.error("something wrong when adding QAState");
+        }
+    }
 
     private static void indexQAState(IndexWriter w, QAState qaState) {
         // Each qastate is map to a set of docs. each of them has different question
         // but they all have the same answer
         // consider each doc as a emission path, they all lead to the same state.
-        qaState.getQuestions().stream().forEach(p -> {
+        qaState.getQuestions().forEach(p -> {
             Document doc = new Document();
             doc.add(new TextField("Question", p, Field.Store.NO));
             doc.add(new StoredField("QAState", qaState.hashCode()));
@@ -64,13 +67,17 @@ public class LuceneIndexer {
         });
     }
 
-    public void index(Set<QAState> qaStates) throws IOException {
+    public void addManyQAState(Set<QAState> qaStates) throws IOException {
         IndexWriter w = new IndexWriter(index, config);
-        qaStates.stream().forEach(p -> {
+        qaStates.forEach(p -> {
             indexQAState(w, p);
             qaStateMap.put(p.hashCode(), p);
         });
         w.close();
+    }
+
+    public void addQAState(QAState qaState) throws IOException {
+        addManyQAState(new HashSet<>(Collections.singletonList(qaState)));
     }
 
     public Collection<String> search(String question) throws IOException, ParseException {

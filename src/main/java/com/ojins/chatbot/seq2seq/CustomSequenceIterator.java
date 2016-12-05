@@ -108,13 +108,13 @@ public class CustomSequenceIterator implements MultiDataSetIterator {
                 then reversed and then masked
                 Reversing input gives significant gain
                 Each character is transformed to a 12 dimensional one hot vector
-                    (index 0-9 for corresponding digits, 10 for "+", 11 for " ")
+                    (addManyQAState 0-9 for corresponding digits, 10 for "+", 11 for " ")
             */
             int spaceFill = (encoderSeqLength) - (num1 + "+" + num2).length();
             int iPos = 0;
             //Fill in spaces, as necessary
             while (spaceFill > 0) {
-                //spaces encoded at index 12
+                //spaces encoded at addManyQAState 12
                 encoderSeq.putScalar(new int[] {iSample,11,iPos},1);
                 iPos++;
                 spaceFill--;
@@ -127,7 +127,7 @@ public class CustomSequenceIterator implements MultiDataSetIterator {
                 encoderSeq.putScalar(new int[] {iSample,onehot,iPos},1);
                 iPos++;
             }
-            //Fill in operator in this case "+", encoded at index 11
+            //Fill in operator in this case "+", encoded at addManyQAState 11
             encoderSeq.putScalar(new int [] {iSample,10,iPos},1);
             iPos++;
             //Fill in the digits in num1 backwards
@@ -156,9 +156,9 @@ public class CustomSequenceIterator implements MultiDataSetIterator {
                 iPos++;
             }
             //Fill in spaces, as necessary
-            //Leaves last index for "."
+            //Leaves last addManyQAState for "."
             while (iPos < numdigits + 1) {
-                //spaces encoded at index 12
+                //spaces encoded at addManyQAState 12
                 outputSeq.putScalar(new int [] {iSample,11,iPos}, 1);
                 //decoder input filled with spaces
                 decoderSeq.putScalar(new int [] {iSample,11,iPos},1);

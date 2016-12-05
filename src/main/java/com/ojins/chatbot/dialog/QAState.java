@@ -2,10 +2,7 @@ package com.ojins.chatbot.dialog;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by han on 11/12/16.
@@ -31,6 +28,11 @@ public class QAState {
     public QAState(List<String> questions, List<String> answers) {
         this.questions = questions;
         this.answers = answers;
+    }
+
+    public QAState(String question, String answer) {
+        this.questions = new ArrayList<>(Collections.singletonList(question));
+        this.answers = new ArrayList<>(Collections.singletonList(answer));
     }
 
 

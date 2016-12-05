@@ -105,7 +105,7 @@ public class QAIterator implements MultiDataSetIterator {
                 then reversed and then masked
                 Reversing input gives significant gain
                 Each character is transformed to a 12 dimensional one hot vector
-                    (index 0-9 for corresponding digits, 10 for "+", 11 for " ")
+                    (addManyQAState 0-9 for corresponding digits, 10 for "+", 11 for " ")
             */
             int spaceFill = encoderSeqLength - sampleQ.length;
             int iPos = 0;
@@ -135,9 +135,9 @@ public class QAIterator implements MultiDataSetIterator {
                 iPos++;
             }
             //Fill in spaces, as necessary
-            //Leaves last index for "."
+            //Leaves last addManyQAState for "."
             while (iPos < decoderSeqLength) {
-                //spaces encoded at index 12
+                //spaces encoded at addManyQAState 12
                 outputSeq.putScalar(new int[]{iSample, encodedQASet.SPACE_OR_END, iPos}, 1);
                 //decoder input filled with spaces
                 decoderSeq.putScalar(new int[]{iSample, encodedQASet.SPACE_OR_END, iPos}, 1);
