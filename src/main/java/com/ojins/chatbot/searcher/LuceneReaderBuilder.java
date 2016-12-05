@@ -2,7 +2,11 @@ package com.ojins.chatbot.searcher;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
+
+import java.io.IOException;
+import java.nio.file.Paths;
 
 public class LuceneReaderBuilder {
     private Analyzer chineseAnalyzer = new ChineseSynonymAnalyzer();
@@ -16,6 +20,15 @@ public class LuceneReaderBuilder {
 
     public LuceneReaderBuilder setIndex(Directory index) {
         this.index = index;
+        return this;
+    }
+
+    public LuceneReaderBuilder setFilePath(String fp) {
+        try {
+            this.index = FSDirectory.open(Paths.get(fp));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
         return this;
     }
 

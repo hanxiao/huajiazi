@@ -27,6 +27,10 @@ public class testIndexer {
                 .createLuceneReader();
 
         String[] testQueries = {"面试一般要等多久会有结果啊", "你能给我讲讲申请的步骤么", "冬天冷么", "奖学金怎么申请啊"};
+        getAnswerForQuestions(luceneReader, testQueries);
+    }
+
+    public static void getAnswerForQuestions(LuceneReader luceneReader, String[] testQueries) {
         try {
             for (String q : testQueries) {
                 System.out.println("question:" + q);
