@@ -1,13 +1,14 @@
+import com.google.common.collect.Sets;
+import com.google.gson.Gson;
 import com.ojins.chatbot.service.QAService;
 import com.ojins.chatbot.service.QAServiceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static spark.Spark.*;
 
@@ -18,11 +19,18 @@ public class Main {
 
     private static transient final Logger LOG = LoggerFactory.getLogger(Main.class);
 
+    private static final String CORS_ORIGIN = "*";
+    private static final String CORS_METHODS = "GET, POST, OPTIONS, PUT, PATCH, DELETE";
+    private static final String CORS_HEADERS = "Origin, X-Requested-With, Content-Type, Accept, Authorization";
+
     private static Map<String, QAService> qaServiceMap;
 
-    public static void init() {
+    public static void initQAService() {
         // add all exisiting
-        qaServiceMap = Stream.concat(Arrays.stream(QAService.getAvailableTopics()), Stream.of("default")).collect(
+        Set<String> availableTopics = Sets.newHashSet(QAService.getAvailableTopics());
+        availableTopics.add("default");
+
+        qaServiceMap = availableTopics.stream().collect(
                 Collectors.toMap(s -> s, s -> new QAServiceBuilder()
                         .setTopic(s)
                         .setOverwrite(false)
@@ -30,9 +38,28 @@ public class Main {
     }
 
     public static void main(final String[] args) throws IOException {
-        init();
-        get("/hello", (req, res) -> "Hello World");
+        Gson gson = new Gson();
 
+        initQAService();
+        enableCORS(CORS_ORIGIN, CORS_METHODS, CORS_HEADERS);
+
+        get("/info/topic",
+                (req, res) -> QAService.getAvailableTopics(), gson::toJson);
+
+        get("/info/:topic/size",
+                (req, res) -> qaServiceMap.getOrDefault(req.params(":topic"),
+                        qaServiceMap.get("default")).getNumDocs(),
+                gson::toJson);
+
+        get("/ask/:topic/:quest",
+                (req, res) -> qaServiceMap.getOrDefault(req.params(":topic"),
+                        qaServiceMap.get("default")).getAnswer(req.params(":quest")),
+                gson::toJson);
+
+        get("teach/:topic/:quest/:answer",
+                (req, res) -> qaServiceMap.getOrDefault(req.params(":topic"),
+                        qaServiceMap.get("default")).addQAPair(req.params(":quest"), req.params(":answer")),
+                gson::toJson);
     }
 
     // Enables CORS on requests. This method is an initialization method and should be called once.
@@ -60,6 +87,11 @@ public class Main {
             // Note: this may or may not be necessary in your particular application
             response.type("application/json");
         });
+
+        after((request, response) -> {
+            response.header("Content-Encoding", "gzip");
+        });
+
     }
 }
 
