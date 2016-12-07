@@ -46,6 +46,12 @@ public class testService {
     }
 
     @Test
+    public void testMultipleQuestions() {
+        qaService = QAService.selectTopic("phd").orElse(null);
+        System.out.println(qaService.getAnswer(new String[]{"申请步骤", "如何套磁"}));
+    }
+
+    @Test
     public void testLoadFromPreviousIndex() throws IOException {
         Assert.assertEquals(qaService.getNumDocs(), 180);
     }

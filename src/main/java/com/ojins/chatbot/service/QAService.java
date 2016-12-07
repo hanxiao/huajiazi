@@ -6,15 +6,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by han on 12/5/16.
@@ -65,12 +62,7 @@ public class QAService {
 
     public static String[] getAvailableTopics() {
         File file = new File("index/");
-        return file.list(new FilenameFilter() {
-            @Override
-            public boolean accept(File current, String name) {
-                return new File(current, name).isDirectory();
-            }
-        });
+        return file.list((current, name) -> new File(current, name).isDirectory());
     }
 
     public static Optional<QAService> selectTopic(String topic) {
@@ -89,6 +81,10 @@ public class QAService {
             ex.printStackTrace();
             return Optional.empty();
         }
+    }
+
+    public List<Optional<QAResult>> getAnswer(String[] question) {
+        return Arrays.stream(question).map(this::getAnswer).collect(Collectors.toList());
     }
 
     public boolean addQAPair(String question, String answer) {
