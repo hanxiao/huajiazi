@@ -58,6 +58,7 @@ public class LuceneReader {
         for (ScoreDoc h : hits) {
             String curAnswer = searcher.doc(h.doc).get("Answer");
             String curQuestion = searcher.doc(h.doc).get("Question");
+            if (curAnswer.startsWith("UNSOLVED")) { continue; }
             if (answers.containsKey(curAnswer)) {
                 answers.get(curAnswer).score += h.score;
                 answers.get(curAnswer).hits++;
@@ -71,7 +72,7 @@ public class LuceneReader {
             return Optional.empty();
         }
 
-        answers.values().stream().forEach(p -> {
+        answers.values().forEach(p -> {
             p.score = p.score / p.hits;
         });
 

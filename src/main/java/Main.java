@@ -1,5 +1,8 @@
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
+import com.ojins.chatbot.dialog.QAResult;
+import com.ojins.chatbot.response.NewQA;
 import com.ojins.chatbot.service.QAService;
 import com.ojins.chatbot.service.QAServiceBuilder;
 import org.slf4j.Logger;
@@ -7,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,7 +45,8 @@ public class Main {
         Gson gson = new Gson();
 
         initQAService();
-        enableCORS(CORS_ORIGIN, CORS_METHODS, CORS_HEADERS);
+        initWebService();
+
 
         get("/info/topic",
                 (req, res) -> QAService.getAvailableTopics(), gson::toJson);
@@ -52,14 +57,42 @@ public class Main {
                 gson::toJson);
 
         get("/ask/:topic/:quest",
-                (req, res) -> qaServiceMap.getOrDefault(req.params(":topic"),
-                        qaServiceMap.get("default")).getAnswer(req.params(":quest")),
+                (req, res) -> {
+                    Optional<QAResult> answer = qaServiceMap.getOrDefault(req.params(":topic"),
+                            qaServiceMap.get("default")).getAnswer(req.params(":quest"));
+                    if (answer.isPresent()) {
+                        res.status(200);
+                        return answer.get();
+                    }
+                    qaServiceMap
+                            .getOrDefault(req.params(":topic"), qaServiceMap.get("default"))
+                            .addQAPair(req.params(":quest"), "UNSOLVED");
+                    res.status(204);
+                    return "";
+                },
                 gson::toJson);
 
-        get("teach/:topic/:quest/:answer",
-                (req, res) -> qaServiceMap.getOrDefault(req.params(":topic"),
-                        qaServiceMap.get("default")).addQAPair(req.params(":quest"), req.params(":answer")),
+        post("teach/",
+                (req, res) -> {
+                    ObjectMapper mapper = new ObjectMapper();
+                    NewQA creation = mapper.readValue(req.body(), NewQA.class);
+                    if (!creation.isValid()) {
+                        res.status(400);
+                        return "";
+                    }
+                    qaServiceMap
+                            .getOrDefault(creation.getTopic(), qaServiceMap.get("default"))
+                            .addQAPair(creation.getQuestion(), creation.getAnswer());
+                    res.status(201);
+                    return "";
+                },
                 gson::toJson);
+    }
+
+    private static void initWebService() {
+        port(9090); // Spark will run on port 9090
+        threadPool(4);
+        enableCORS(CORS_ORIGIN, CORS_METHODS, CORS_HEADERS);
     }
 
     // Enables CORS on requests. This method is an initialization method and should be called once.
