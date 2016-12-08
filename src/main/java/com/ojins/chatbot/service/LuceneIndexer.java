@@ -11,6 +11,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +61,7 @@ public class LuceneIndexer {
             doc.add(new TextField("Question", p, Field.Store.YES));
             doc.add(new TextField("Answer", qaState.getAnswers().get(0), Field.Store.YES));
             try {
-                w.addDocument(doc);
+                w.updateDocument(new Term("questionAsKey", p), doc);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -77,6 +78,7 @@ public class LuceneIndexer {
         qaStates.forEach(p -> {
             indexQAState(w, p);
         });
+        w.commit();
         w.close();
     }
 

@@ -18,10 +18,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -40,10 +38,10 @@ public class LuceneReader {
         this.numAnswer = numAnswer;
     }
 
-    public Optional<QAResult> getAnswers(String question) throws IOException, ParseException {
-        TermQuery term1 = new TermQuery(new Term("Answer", "UNSOLVED"));
-        BooleanQuery q = new BooleanQuery.Builder()
-                .add(term1, BooleanClause.Occur.FILTER)
+    public Optional<List<QAResult>> getUnsolved() throws IOException, ParseException {
+        TermQuery term1 = new TermQuery(new Term("Answer", "unsolved"));
+        Query q = new BooleanQuery.Builder()
+                .add(term1, BooleanClause.Occur.MUST)
                 .build();
 
         IndexReader reader = DirectoryReader.open(index);
@@ -54,19 +52,16 @@ public class LuceneReader {
         for (ScoreDoc h : hits) {
             String curAnswer = searcher.doc(h.doc).get("Answer");
             String curQuestion = searcher.doc(h.doc).get("Question");
-            if (curAnswer.startsWith("UNSOLVED")) { continue; }
-            if (answers.containsKey(curAnswer)) {
-                answers.get(curAnswer).score += h.score;
-                answers.get(curAnswer).hits++;
-            } else {
-                answers.putIfAbsent(curAnswer, new QAScoreTuple(curQuestion, curAnswer, h.score, 1));
-            }
+            answers.putIfAbsent(curQuestion, new QAScoreTuple(curQuestion, curAnswer, h.score, 1));
         }
         reader.close();
 
         if (answers.size() == 0) {
             return Optional.empty();
         }
+
+        return Optional.of(answers.values().stream()
+                .map(p -> new QAResult(p.answer, p.question, null, null, 0)).collect(Collectors.toList()));
 
     }
 
@@ -86,7 +81,9 @@ public class LuceneReader {
         for (ScoreDoc h : hits) {
             String curAnswer = searcher.doc(h.doc).get("Answer");
             String curQuestion = searcher.doc(h.doc).get("Question");
-            if (curAnswer.startsWith("UNSOLVED")) { continue; }
+            if (curAnswer.startsWith("UNSOLVED")) {
+                continue;
+            }
             if (answers.containsKey(curAnswer)) {
                 answers.get(curAnswer).score += h.score;
                 answers.get(curAnswer).hits++;

@@ -83,7 +83,7 @@ public class QAService {
         }
     }
 
-    public Optional<QAResult> getUnsolved() {
+    public Optional<List<QAResult>> getUnsolved() {
         try {
             return luceneReader.getUnsolved();
         } catch (Exception ex) {

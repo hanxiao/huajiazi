@@ -1,29 +1,13 @@
 package com.ojins.chatbot.dialog;
 
+import lombok.Data;
+
 /**
  * Created by hxiao on 2016/12/5.
  */
+
+@Data
 public class QAResult {
-    public String getQuestion() {
-        return question;
-    }
-
-    public String getAnswer() {
-        return answer;
-    }
-
-    public String[] getDidYouMean() {
-        return didYouMean;
-    }
-
-    public String[] getFollowUp() {
-        return followUp;
-    }
-
-    public double getScore() {
-        return score;
-    }
-
     String question, answer;
     String[] didYouMean;
     String[] followUp;

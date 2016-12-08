@@ -2,6 +2,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.ojins.chatbot.dialog.QAResult;
+import com.ojins.chatbot.dialog.QAResultBuilder;
 import com.ojins.chatbot.response.NewQA;
 import com.ojins.chatbot.service.QAService;
 import com.ojins.chatbot.service.QAServiceBuilder;
@@ -9,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -28,6 +30,9 @@ public class Main {
     private static final String CORS_HEADERS = "Origin, X-Requested-With, Content-Type, Accept, Authorization";
 
     private static Map<String, QAService> qaServiceMap;
+    private static final QAResult fallbackUnknown = new QAResultBuilder()
+            .setAnswer("这个问题我现在没法回答……不过我已经记下啦, 过一会儿回答你。")
+            .createQAResult();
 
     public static void initQAService() {
         // add all exisiting
@@ -35,10 +40,12 @@ public class Main {
         availableTopics.add("default");
 
         qaServiceMap = availableTopics.stream().collect(
-                Collectors.toMap(s -> s, s -> new QAServiceBuilder()
-                        .setTopic(s)
-                        .setOverwrite(false)
-                        .createQAService()));
+                Collectors.toMap(
+                        s -> s,
+                        s -> new QAServiceBuilder()
+                                .setTopic(s)
+                                .setOverwrite(false)
+                                .createQAService()));
     }
 
     public static void main(final String[] args) throws IOException {
@@ -48,21 +55,27 @@ public class Main {
         initWebService();
 
 
-        get("/info/topic",
+        get("/topic",
                 (req, res) -> QAService.getAvailableTopics(), gson::toJson);
 
-        get("/info/:topic/size",
+        get("/:topic/size",
                 (req, res) -> qaServiceMap.getOrDefault(req.params(":topic"),
                         qaServiceMap.get("default")).getNumDocs(),
                 gson::toJson);
 
-        get("/info/:topic/unsolved",
-                (req, res) -> qaServiceMap.getOrDefault(req.params(":topic"),
-                        qaServiceMap.get("default")).getNumDocs(),
+        get("/:topic/unsolved",
+                (req, res) -> {
+                    Optional<List<QAResult>> unsolved = qaServiceMap.getOrDefault(req.params(":topic"),
+                            qaServiceMap.get("default")).getUnsolved();
+                    if (unsolved.isPresent()) {
+                        return unsolved.get();
+                    }
+                    res.status(204);
+                    return "";
+                },
                 gson::toJson);
 
-
-        get("/ask/:topic/:quest",
+        get("/:topic/ask/:quest",
                 (req, res) -> {
                     Optional<QAResult> answer = qaServiceMap.getOrDefault(req.params(":topic"),
                             qaServiceMap.get("default")).getAnswer(req.params(":quest"));
@@ -73,8 +86,8 @@ public class Main {
                     qaServiceMap
                             .getOrDefault(req.params(":topic"), qaServiceMap.get("default"))
                             .addQAPair(req.params(":quest"), "UNSOLVED");
-                    res.status(204);
-                    return "";
+                    res.status(202);
+                    return fallbackUnknown;
                 },
                 gson::toJson);
 
