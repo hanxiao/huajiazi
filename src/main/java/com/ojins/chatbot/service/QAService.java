@@ -83,6 +83,15 @@ public class QAService {
         }
     }
 
+    public Optional<QAResult> getUnsolved() {
+        try {
+            return luceneReader.getUnsolved();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Optional.empty();
+        }
+    }
+
     public List<Optional<QAResult>> getAnswer(String[] question) {
         return Arrays.stream(question).map(this::getAnswer).collect(Collectors.toList());
     }

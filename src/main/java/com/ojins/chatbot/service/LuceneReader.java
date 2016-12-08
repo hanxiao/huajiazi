@@ -8,12 +8,10 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.*;
 import org.apache.lucene.store.Directory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +38,36 @@ public class LuceneReader {
         this.chineseAnalyzer = chineseAnalyzer;
         this.index = index;
         this.numAnswer = numAnswer;
+    }
+
+    public Optional<QAResult> getAnswers(String question) throws IOException, ParseException {
+        TermQuery term1 = new TermQuery(new Term("Answer", "UNSOLVED"));
+        BooleanQuery q = new BooleanQuery.Builder()
+                .add(term1, BooleanClause.Occur.FILTER)
+                .build();
+
+        IndexReader reader = DirectoryReader.open(index);
+        IndexSearcher searcher = new IndexSearcher(reader);
+        TopDocs docs = searcher.search(q, 10000);
+        ScoreDoc[] hits = docs.scoreDocs;
+        Map<String, QAScoreTuple> answers = new HashMap<>();
+        for (ScoreDoc h : hits) {
+            String curAnswer = searcher.doc(h.doc).get("Answer");
+            String curQuestion = searcher.doc(h.doc).get("Question");
+            if (curAnswer.startsWith("UNSOLVED")) { continue; }
+            if (answers.containsKey(curAnswer)) {
+                answers.get(curAnswer).score += h.score;
+                answers.get(curAnswer).hits++;
+            } else {
+                answers.putIfAbsent(curAnswer, new QAScoreTuple(curQuestion, curAnswer, h.score, 1));
+            }
+        }
+        reader.close();
+
+        if (answers.size() == 0) {
+            return Optional.empty();
+        }
+
     }
 
     public Optional<QAResult> getAnswers(String question) throws IOException, ParseException {

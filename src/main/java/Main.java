@@ -56,6 +56,12 @@ public class Main {
                         qaServiceMap.get("default")).getNumDocs(),
                 gson::toJson);
 
+        get("/info/:topic/unsolved",
+                (req, res) -> qaServiceMap.getOrDefault(req.params(":topic"),
+                        qaServiceMap.get("default")).getNumDocs(),
+                gson::toJson);
+
+
         get("/ask/:topic/:quest",
                 (req, res) -> {
                     Optional<QAResult> answer = qaServiceMap.getOrDefault(req.params(":topic"),
