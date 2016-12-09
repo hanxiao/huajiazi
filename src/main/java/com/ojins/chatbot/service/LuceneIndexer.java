@@ -5,6 +5,7 @@ import com.ojins.chatbot.dialog.QAState;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -53,10 +54,11 @@ public class LuceneIndexer {
         qaState.getQuestions().forEach(p -> {
             Document doc = new Document();
             doc.add(new TextField("Question", p, Field.Store.YES));
+            doc.add(new StoredField("QOriginal", p));
             doc.add(new TextField("Answer", qaState.getAnswers().get(0), Field.Store.YES));
             try {
                 if (overwrite) {
-                    Query q = new TermQuery(new Term("Question", p));
+                    Query q = new TermQuery(new Term("QOriginal", p));
                     w.deleteDocuments(q);
                 }
                 w.addDocument(doc);
