@@ -97,16 +97,16 @@ public class QAService {
     }
 
     public boolean addQAPair(String question, String answer) {
-        return luceneIndexer.addQAState(new QAState(question, answer));
+        return addQAPair(question, answer, false);
     }
 
-    public void printServiceInfo() {
+    public boolean addQAPair(String question, String answer, boolean update) {
+        return luceneIndexer.addQAState(new QAState(question, answer), update);
+    }
+
+    private void printServiceInfo() {
         try {
-            LOG.info(String.format(
-                    "\n*******************\n" +
-                            "Topic: %s\n" +
-                            "Docs: %d\n" +
-                            "*******************", curTopic, luceneReader.getNumDocs()));
+            LOG.info(String.format("topic: %s;\tdocs: %d\n", curTopic, luceneReader.getNumDocs()));
         } catch (IOException ex) {
             ex.printStackTrace();
         }

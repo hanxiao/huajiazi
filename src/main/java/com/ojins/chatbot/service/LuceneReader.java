@@ -32,13 +32,13 @@ public class LuceneReader {
     private Directory index;
     private int numAnswer;
 
-    public LuceneReader(Analyzer chineseAnalyzer, Directory index, int numAnswer) {
+    LuceneReader(Analyzer chineseAnalyzer, Directory index, int numAnswer) {
         this.chineseAnalyzer = chineseAnalyzer;
         this.index = index;
         this.numAnswer = numAnswer;
     }
 
-    public Optional<List<QAResult>> getUnsolved() throws IOException, ParseException {
+    Optional<List<QAResult>> getUnsolved() throws IOException, ParseException {
         TermQuery term1 = new TermQuery(new Term("Answer", "unsolved"));
         Query q = new BooleanQuery.Builder()
                 .add(term1, BooleanClause.Occur.MUST)
@@ -114,7 +114,7 @@ public class LuceneReader {
                 .createQAResult());
     }
 
-    public int getNumDocs() throws IOException {
+    int getNumDocs() throws IOException {
         IndexReader reader = DirectoryReader.open(index);
         return reader.numDocs();
     }

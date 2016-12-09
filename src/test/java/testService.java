@@ -53,7 +53,35 @@ public class testService {
 
     @Test
     public void testLoadFromPreviousIndex() throws IOException {
-        Assert.assertEquals(qaService.getNumDocs(), 180);
+        Assert.assertEquals(qaService.getNumDocs(), 181);
+    }
+
+    @Test
+    public void testAddDuplicateTurnOff() throws IOException {
+        qaService = new QAServiceBuilder()
+                .setTopic("default")
+                .setOverwrite(true)
+                .createQAService();
+        // default service has one default qastate
+        qaService.addQAPair("你好我好大家好", "知道了");
+        qaService.addQAPair("你好我好大家好", "知道了");
+        Assert.assertEquals(qaService.getNumDocs(), 3);
+
+        qaService.addQAPair("你好我好大家好", "知道了", true);
+        Assert.assertEquals(qaService.getNumDocs(), 2);
+    }
+
+    @Test
+    public void testAddDuplicateTurnOn() throws IOException {
+        qaService = new QAServiceBuilder()
+                .setTopic("default")
+                .setOverwrite(true)
+                .createQAService();
+        // default service has one default qastate
+        qaService.addQAPair("新中国成立啦", "知道了", true);
+        qaService.addQAPair("新中国成立了", "知道了", true);
+        qaService.addQAPair("新中国", "知道了", true);
+        Assert.assertEquals(qaService.getNumDocs(), 2);
     }
 
     @Test

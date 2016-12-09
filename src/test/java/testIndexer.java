@@ -44,7 +44,6 @@ public class testIndexer {
         getAnswerForQuestions(luceneReader, "谁是世界上最伟大的国家");
     }
 
-
     @Test
     public void testUpdating() throws IOException {
 

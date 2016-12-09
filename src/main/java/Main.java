@@ -75,7 +75,7 @@ public class Main {
                 },
                 gson::toJson);
 
-        get("/:topic/ask/:quest",
+        get("/:topic/:quest",
                 (req, res) -> {
                     Optional<QAResult> answer = qaServiceMap.getOrDefault(req.params(":topic"),
                             qaServiceMap.get("default")).getAnswer(req.params(":quest"));
@@ -85,13 +85,13 @@ public class Main {
                     }
                     qaServiceMap
                             .getOrDefault(req.params(":topic"), qaServiceMap.get("default"))
-                            .addQAPair(req.params(":quest"), "UNSOLVED");
+                            .addQAPair(req.params(":quest"), "UNSOLVED", true);
                     res.status(202);
                     return fallbackUnknown;
                 },
                 gson::toJson);
 
-        post("teach/",
+        post("/:topic/teach/",
                 (req, res) -> {
                     ObjectMapper mapper = new ObjectMapper();
                     NewQA creation = mapper.readValue(req.body(), NewQA.class);
@@ -100,7 +100,7 @@ public class Main {
                         return "";
                     }
                     qaServiceMap
-                            .getOrDefault(creation.getTopic(), qaServiceMap.get("default"))
+                            .getOrDefault(req.params(":topic"), qaServiceMap.get("default"))
                             .addQAPair(creation.getQuestion(), creation.getAnswer());
                     res.status(201);
                     return "";

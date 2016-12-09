@@ -9,9 +9,8 @@ import lombok.Data;
 public class NewQA {
     private String question;
     private String answer;
-    private String topic;
 
     public boolean isValid() {
-        return question != null && answer != null && topic != null;
+        return question != null && answer != null;
     }
 }
