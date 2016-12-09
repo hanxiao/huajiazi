@@ -20,7 +20,7 @@ public class testService {
     public testService() throws FileNotFoundException {
         qaStates = StateIO.loadStatesFromJson("src/test/statedb-small.json");
         qaService = new QAServiceBuilder()
-                .setQAStates(qaStates)
+                .setQaStates(qaStates)
                 .setTopic("phd")
                 .setOverwrite(true)
                 .createQAService();
@@ -28,7 +28,7 @@ public class testService {
         qaService.addQAPair("这是什么主题的数据库?", "博士申请");
 
         qaService = new QAServiceBuilder()
-                .setQAStates(qaStates)
+                .setQaStates(qaStates)
                 .setTopic("quant")
                 .setOverwrite(true)
                 .createQAService();
@@ -41,7 +41,7 @@ public class testService {
         Assert.assertEquals(qaService.getAnswer("这是什么主题数据库?").get().getAnswer(), "量化交易");
         qaService = QAService.selectTopic("phd").orElse(null);
         if (qaService != null) {
-            Assert.assertEquals(qaService.getAnswer("这是什么主题数据库?").get().getAnswer(), "博士申请");
+            Assert.assertEquals("博士申请", qaService.getAnswer("这是什么主题数据库?").get().getAnswer());
         }
     }
 
@@ -53,7 +53,7 @@ public class testService {
 
     @Test
     public void testLoadFromPreviousIndex() throws IOException {
-        Assert.assertEquals(qaService.getNumDocs(), 181);
+        Assert.assertEquals(181, qaService.getNumDocs());
     }
 
     @Test
@@ -65,10 +65,10 @@ public class testService {
         // default service has one default qastate
         qaService.addQAPair("你好我好大家好", "知道了");
         qaService.addQAPair("你好我好大家好", "知道了");
-        Assert.assertEquals(qaService.getNumDocs(), 3);
+        Assert.assertEquals(3, qaService.getNumDocs());
 
         qaService.addQAPair("你好我好大家好", "知道了", true);
-        Assert.assertEquals(qaService.getNumDocs(), 2);
+        Assert.assertEquals(2, qaService.getNumDocs());
     }
 
     @Test
@@ -81,7 +81,7 @@ public class testService {
         qaService.addQAPair("新中国成立啦", "知道了", true);
         qaService.addQAPair("新中国成立了", "知道了", true);
         qaService.addQAPair("新中国", "知道了", true);
-        Assert.assertEquals(qaService.getNumDocs(), 2);
+        Assert.assertEquals(2, qaService.getNumDocs());
     }
 
     @Test

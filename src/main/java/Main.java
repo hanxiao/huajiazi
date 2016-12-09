@@ -1,11 +1,11 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
-import com.ojins.chatbot.dialog.QAResult;
-import com.ojins.chatbot.dialog.QAResultBuilder;
-import com.ojins.chatbot.response.NewQA;
+import com.ojins.chatbot.dialog.QAPair;
+import com.ojins.chatbot.dialog.QAPairBuilder;
 import com.ojins.chatbot.service.QAService;
 import com.ojins.chatbot.service.QAServiceBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +21,8 @@ import static spark.Spark.*;
 /**
  * Created by han on 11/12/16.
  */
+
+@Slf4j
 public class Main {
 
     private static transient final Logger LOG = LoggerFactory.getLogger(Main.class);
@@ -30,9 +32,9 @@ public class Main {
     private static final String CORS_HEADERS = "Origin, X-Requested-With, Content-Type, Accept, Authorization";
 
     private static Map<String, QAService> qaServiceMap;
-    private static final QAResult fallbackUnknown = new QAResultBuilder()
+    private static final QAPair fallbackUnknown = new QAPairBuilder()
             .setAnswer("这个问题我现在没法回答……不过我已经记下啦, 过一会儿回答你。")
-            .createQAResult();
+            .build();
 
     public static void initQAService() {
         // add all exisiting
@@ -65,7 +67,7 @@ public class Main {
 
         get("/:topic/unsolved",
                 (req, res) -> {
-                    Optional<List<QAResult>> unsolved = qaServiceMap.getOrDefault(req.params(":topic"),
+                    Optional<List<QAPair>> unsolved = qaServiceMap.getOrDefault(req.params(":topic"),
                             qaServiceMap.get("default")).getUnsolved();
                     if (unsolved.isPresent()) {
                         return unsolved.get();
@@ -77,7 +79,7 @@ public class Main {
 
         get("/:topic/:quest",
                 (req, res) -> {
-                    Optional<QAResult> answer = qaServiceMap.getOrDefault(req.params(":topic"),
+                    Optional<QAPair> answer = qaServiceMap.getOrDefault(req.params(":topic"),
                             qaServiceMap.get("default")).getAnswer(req.params(":quest"));
                     if (answer.isPresent()) {
                         res.status(200);
@@ -94,7 +96,7 @@ public class Main {
         post("/:topic/teach/",
                 (req, res) -> {
                     ObjectMapper mapper = new ObjectMapper();
-                    NewQA creation = mapper.readValue(req.body(), NewQA.class);
+                    QAPair creation = mapper.readValue(req.body(), QAPair.class);
                     if (!creation.isValid()) {
                         res.status(400);
                         return "";

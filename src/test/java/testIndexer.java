@@ -1,4 +1,4 @@
-import com.ojins.chatbot.dialog.QAResult;
+import com.ojins.chatbot.dialog.QAPair;
 import com.ojins.chatbot.dialog.QAState;
 import com.ojins.chatbot.dialog.StateIO;
 import com.ojins.chatbot.service.LuceneIndexer;
@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 
@@ -24,7 +23,7 @@ public class testIndexer {
         Set<QAState> qaStates = StateIO.loadStatesFromJson("src/test/statedb-small.json");
         luceneIndexer = new LuceneIndexerBuilder()
                 .setFilePath("index")
-                .setQAStates(qaStates)
+                .setQaStates(qaStates)
                 .createLuceneIndexer();
 
         luceneReader = new LuceneReaderBuilder()
@@ -56,9 +55,9 @@ public class testIndexer {
     public static void getAnswerForQuestions(LuceneReader luceneReader, String[] testQueries) {
         try {
             for (String q : testQueries) {
-                Optional<QAResult> tmp = luceneReader.getAnswers(q);
+                Optional<QAPair> tmp = luceneReader.getAnswers(q);
                 if (tmp.isPresent()) {
-                    printQAResult(tmp.get());
+                    System.out.println(tmp.get().toString());
                 } else {
                     System.out.println(String.format("question: %s has no answer!", q));
                 }
@@ -69,11 +68,4 @@ public class testIndexer {
         }
     }
 
-    public static void printQAResult(QAResult tmp) {
-        System.out.println("+ Question:" + tmp.getQuestion());
-        System.out.println("+ Answer:" + tmp.getAnswer());
-        System.out.println("+ Score:" + tmp.getScore());
-        System.out.println("+ Did you mean:" + Arrays.toString(tmp.getDidYouMean()));
-
-    }
 }

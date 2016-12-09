@@ -4,10 +4,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.ojins.chatbot.util.CollectionAdapter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.Cleanup;
+import lombok.extern.slf4j.Slf4j;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Scanner;
@@ -16,32 +19,27 @@ import java.util.Set;
 /**
  * Created by han on 11/14/16.
  */
+
+@Slf4j
 public class StateIO {
-    private static transient final Logger LOG = LoggerFactory.getLogger(StateIO.class);
     private static Gson gson = new GsonBuilder()
             .registerTypeHierarchyAdapter(Collection.class, new CollectionAdapter()).create();
 
-    public static Set<QAState> loadStatesFromJson(String fp) throws FileNotFoundException {
+    public static Set<QAPair> loadStatesFromJson(String fp) throws FileNotFoundException {
         String content = new Scanner(new File(fp)).useDelimiter("\\Z").next();
-        Type setType = new TypeToken<Set<QAState>>() {
+        Type setType = new TypeToken<Set<QAPair>>() {
         }.getType();
         return gson.fromJson(content, setType);
     }
 
-    public static void writeStatesToJson(Set<QAState> states, String fp) {
-        String jsonOutput = gson.toJson(states);
-        writeToFile(new File(fp), jsonOutput);
-    }
-
-
-    private static void writeToFile(File outFile, String jsonOutput) {
+    public static void writeStatesToJson(Set<QAPair> states, String fp) {
         try {
-            PrintWriter writer = new PrintWriter(new FileOutputStream(outFile, false));
-            writer.println(jsonOutput);
+            @Cleanup PrintWriter writer = new PrintWriter(new FileOutputStream(new File(fp), false));
+            writer.println(gson.toJson(states));
             writer.flush();
-            writer.close();
-        } catch (IOException ex) {
-            LOG.error("Could not save Database {}", outFile, ex);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            log.error("Something wrong when writing states to the file");
         }
     }
 }

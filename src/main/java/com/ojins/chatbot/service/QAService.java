@@ -1,9 +1,8 @@
 package com.ojins.chatbot.service;
 
-import com.ojins.chatbot.dialog.QAResult;
+import com.ojins.chatbot.dialog.QAPair;
 import com.ojins.chatbot.dialog.QAState;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,12 +15,12 @@ import java.util.stream.Collectors;
 /**
  * Created by han on 12/5/16.
  */
+
+@Slf4j
 public class QAService {
     private LuceneIndexer luceneIndexer;
     private LuceneReader luceneReader;
     private String curTopic;
-
-    private static transient final Logger LOG = LoggerFactory.getLogger(LuceneReader.class);
 
     public QAService(Set<QAState> qaStates, String topic, boolean overwrite) {
         curTopic = topic;
@@ -29,16 +28,16 @@ public class QAService {
 
         if (!Files.exists(fp) || overwrite) {
             if (Files.exists(fp) && overwrite) {
-                LOG.info(String.format("topic: %s already exists, but I will overwrite it", topic));
+                log.info(String.format("topic: %s already exists, but I will overwrite it", topic));
             } else if (!Files.exists(fp)) {
-                LOG.info(String.format("topic: %s not exists, I will create it", topic));
+                log.info(String.format("topic: %s not exists, I will create it", topic));
             }
             luceneIndexer = new LuceneIndexerBuilder()
                     .setFilePath(fp.toString())
-                    .setQAStates(qaStates)
+                    .setQaStates(qaStates)
                     .createLuceneIndexer();
         } else {
-            LOG.info(String.format("topic: %s already exists, will loading from it", topic));
+            log.info(String.format("topic: %s already exists, will loading from it", topic));
             luceneIndexer = new LuceneIndexerBuilder()
                     .setFilePath(fp.toString())
                     .createLuceneIndexer();
@@ -69,12 +68,12 @@ public class QAService {
         if (new HashSet<>(Arrays.asList(getAvailableTopics())).contains(topic)) {
             return Optional.of(new QAServiceBuilder().setTopic(topic).createQAService());
         } else {
-            LOG.warn(String.format("Do not support topic %s", topic));
+            log.warn(String.format("Do not support topic %s", topic));
             return Optional.empty();
         }
     }
 
-    public Optional<QAResult> getAnswer(String question) {
+    public Optional<QAPair> getAnswer(String question) {
         try {
             return luceneReader.getAnswers(question);
         } catch (Exception ex) {
@@ -83,7 +82,7 @@ public class QAService {
         }
     }
 
-    public Optional<List<QAResult>> getUnsolved() {
+    public Optional<List<QAPair>> getUnsolved() {
         try {
             return luceneReader.getUnsolved();
         } catch (Exception ex) {
@@ -92,7 +91,7 @@ public class QAService {
         }
     }
 
-    public List<Optional<QAResult>> getAnswer(String[] question) {
+    public List<Optional<QAPair>> getAnswer(String[] question) {
         return Arrays.stream(question).map(this::getAnswer).collect(Collectors.toList());
     }
 
@@ -106,7 +105,7 @@ public class QAService {
 
     private void printServiceInfo() {
         try {
-            LOG.info(String.format("topic: %s;\tdocs: %d\n", curTopic, luceneReader.getNumDocs()));
+            log.info(String.format("topic: %s;\tdocs: %d\n", curTopic, luceneReader.getNumDocs()));
         } catch (IOException ex) {
             ex.printStackTrace();
         }
