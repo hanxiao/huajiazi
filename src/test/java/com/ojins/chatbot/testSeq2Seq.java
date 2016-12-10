@@ -1,3 +1,5 @@
+package com.ojins.chatbot;
+
 import com.ojins.chatbot.dialog.QAPair;
 import com.ojins.chatbot.dialog.QAPairBuilder;
 import com.ojins.chatbot.seq2seq.EncodedQASet;
@@ -27,7 +29,18 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by han on 11/23/16.
+
+ ___   ___  ________  ___   __      __     __   ________ ________  ______
+ /__/\ /__/\/_______/\/__/\ /__/\   /__/\ /__/\ /_______//_______/\/_____/\
+ \::\ \\  \ \::: _  \ \::\_\\  \ \  \ \::\\:.\ \\__.::._\\::: _  \ \:::_ \ \
+ \::\/_\ .\ \::(_)  \ \:. `-\  \ \  \_\::_\:_\/   \::\ \ \::(_)  \ \:\ \ \ \
+ \:: ___::\ \:: __  \ \:. _    \ \   _\/__\_\_/\ _\::\ \_\:: __  \ \:\ \ \ \
+ \: \ \\::\ \:.\ \  \ \. \`-\  \ \  \ \ \ \::\ /__\::\__/\:.\ \  \ \:\_\ \ \
+ \__\/ \::\/\__\/\__\/\__\/ \__\/   \_\/  \__\\________\/\__\/\__\/\_____\/
+
+
+
+ * Created on 11/23/16.
  */
 public class testSeq2Seq {
     @Test
@@ -87,7 +100,7 @@ public class testSeq2Seq {
 
             MultiDataSet testData = iterator.generateTest(testSize);
             ArrayList<int[]> testNums = iterator.testFeatures();
-            INDArray[] prediction_array = net.output(new INDArray[]{testData.getFeatures(0), testData.getFeatures(1)});
+            INDArray[] prediction_array = net.output(testData.getFeatures(0), testData.getFeatures(1));
             INDArray predictions = prediction_array[0];
             INDArray answers = Nd4j.argMax(predictions, 1);
 //

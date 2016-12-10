@@ -1,3 +1,5 @@
+package com.ojins.chatbot;
+
 import com.ojins.chatbot.analyzer.ChineseSynonymAnalyzer;
 import com.ojins.chatbot.util.HelperFunction;
 import lombok.extern.slf4j.Slf4j;
@@ -6,7 +8,18 @@ import org.apache.lucene.analysis.Analyzer;
 import org.junit.Test;
 
 /**
- * Created by han on 11/14/16.
+
+ ___   ___  ________  ___   __      __     __   ________ ________  ______
+ /__/\ /__/\/_______/\/__/\ /__/\   /__/\ /__/\ /_______//_______/\/_____/\
+ \::\ \\  \ \::: _  \ \::\_\\  \ \  \ \::\\:.\ \\__.::._\\::: _  \ \:::_ \ \
+ \::\/_\ .\ \::(_)  \ \:. `-\  \ \  \_\::_\:_\/   \::\ \ \::(_)  \ \:\ \ \ \
+ \:: ___::\ \:: __  \ \:. _    \ \   _\/__\_\_/\ _\::\ \_\:: __  \ \:\ \ \ \
+ \: \ \\::\ \:.\ \  \ \. \`-\  \ \  \ \ \ \::\ /__\::\__/\:.\ \  \ \:\_\ \ \
+ \__\/ \::\/\__\/\__\/\__\/ \__\/   \_\/  \__\\________\/\__\/\__\/\_____\/
+
+
+
+ * Created on 11/14/16.
  */
 @Slf4j
 public class testTokenizer {

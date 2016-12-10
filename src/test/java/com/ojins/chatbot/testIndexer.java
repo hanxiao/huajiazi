@@ -1,3 +1,5 @@
+package com.ojins.chatbot;
+
 import com.ojins.chatbot.dialog.QAPair;
 import com.ojins.chatbot.dialog.QAPairBuilder;
 import com.ojins.chatbot.dialog.StateIO;
@@ -12,7 +14,18 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Created by han on 11/14/16.
+
+ ___   ___  ________  ___   __      __     __   ________ ________  ______
+ /__/\ /__/\/_______/\/__/\ /__/\   /__/\ /__/\ /_______//_______/\/_____/\
+ \::\ \\  \ \::: _  \ \::\_\\  \ \  \ \::\\:.\ \\__.::._\\::: _  \ \:::_ \ \
+ \::\/_\ .\ \::(_)  \ \:. `-\  \ \  \_\::_\:_\/   \::\ \ \::(_)  \ \:\ \ \ \
+ \:: ___::\ \:: __  \ \:. _    \ \   _\/__\_\_/\ _\::\ \_\:: __  \ \:\ \ \ \
+ \: \ \\::\ \:.\ \  \ \. \`-\  \ \  \ \ \ \::\ /__\::\__/\:.\ \  \ \:\_\ \ \
+ \__\/ \::\/\__\/\__\/\__\/ \__\/   \_\/  \__\\________\/\__\/\__\/\_____\/
+
+
+
+ * Created on 11/14/16.
  */
 public class testIndexer {
     private LuceneIndexer luceneIndexer;
