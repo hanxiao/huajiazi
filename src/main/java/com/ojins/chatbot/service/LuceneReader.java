@@ -3,6 +3,7 @@ package com.ojins.chatbot.service;
 import com.ojins.chatbot.dialog.QAPair;
 import com.ojins.chatbot.dialog.QAPairBuilder;
 import com.ojins.chatbot.util.HelperFunction;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
@@ -24,17 +25,12 @@ import java.util.stream.Collectors;
  */
 
 @Slf4j
+@AllArgsConstructor
 public class LuceneReader {
 
     private Analyzer chineseAnalyzer;
     private Directory index;
     private int numAnswer;
-
-    LuceneReader(Analyzer chineseAnalyzer, Directory index, int numAnswer) {
-        this.chineseAnalyzer = chineseAnalyzer;
-        this.index = index;
-        this.numAnswer = numAnswer;
-    }
 
     Optional<List<QAPair>> getUnsolved() throws IOException, ParseException {
         TermQuery term1 = new TermQuery(new Term("Answer", "unsolved"));
@@ -71,7 +67,7 @@ public class LuceneReader {
 
     public Optional<QAPair> getAnswers(String question) throws IOException, ParseException {
         TokenStream ts = chineseAnalyzer.tokenStream("myfield", new StringReader(question));
-        HelperFunction.printTokenStream(ts);
+        HelperFunction.getTokenizerResult(question, chineseAnalyzer);
 
         Query q = new QueryParser("Question", chineseAnalyzer)
                 .parse(QueryParser.escape(question));

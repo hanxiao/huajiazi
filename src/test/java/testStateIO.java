@@ -1,11 +1,11 @@
-import com.ojins.chatbot.dialog.QAState;
+import com.google.common.collect.Sets;
+import com.ojins.chatbot.dialog.QAPair;
+import com.ojins.chatbot.dialog.QAPairBuilder;
 import com.ojins.chatbot.dialog.StateIO;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -15,15 +15,15 @@ public class testStateIO {
 
     @Test
     public void testWrite() {
-        Set<QAState> qaStates = new HashSet<>();
-        qaStates.add(new QAState(Arrays.asList("q1", "q2"), Arrays.asList("a1", "a2")));
+        Set<QAPair> qaStates = Sets.newHashSet(new QAPairBuilder().setQuestion("测试问题1").setAnswer("回答").build(),
+                new QAPairBuilder().setQuestion("测试问题2").setAnswer("回答").build());
 
         StateIO.writeStatesToJson(qaStates, "statedb-test.json");
     }
 
     @Test
     public void testRead() throws IOException {
-        Set<QAState> qaStates = StateIO.loadStatesFromJson("statedb-test.json");
+        Set<QAPair> qaStates = StateIO.loadStatesFromJson("statedb-test.json");
         Assert.assertEquals(qaStates.size(), 1);
     }
 

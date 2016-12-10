@@ -1,7 +1,7 @@
 package com.ojins.chatbot.service;
 
 import com.ojins.chatbot.dialog.QAPair;
-import com.ojins.chatbot.dialog.QAState;
+import com.ojins.chatbot.dialog.QAPairBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -22,7 +22,7 @@ public class QAService {
     private LuceneReader luceneReader;
     private String curTopic;
 
-    public QAService(Set<QAState> qaStates, String topic, boolean overwrite) {
+    public QAService(Set<QAPair> qaStates, String topic, boolean overwrite) {
         curTopic = topic;
         Path fp = Paths.get("index", topic);
 
@@ -100,7 +100,12 @@ public class QAService {
     }
 
     public boolean addQAPair(String question, String answer, boolean update) {
-        return luceneIndexer.addQAState(new QAState(question, answer), update);
+        return luceneIndexer.addQAState(
+                new QAPairBuilder()
+                        .setQuestion(question)
+                        .setAnswer(answer)
+                        .build()
+                , update);
     }
 
     private void printServiceInfo() {

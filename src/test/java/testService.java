@@ -1,4 +1,4 @@
-import com.ojins.chatbot.dialog.QAState;
+import com.ojins.chatbot.dialog.QAPair;
 import com.ojins.chatbot.dialog.StateIO;
 import com.ojins.chatbot.service.QAService;
 import com.ojins.chatbot.service.QAServiceBuilder;
@@ -14,7 +14,7 @@ import java.util.Set;
  * Created by han on 12/5/16.
  */
 public class testService {
-    Set<QAState> qaStates;
+    Set<QAPair> qaStates;
     QAService qaService;
 
     public testService() throws FileNotFoundException {

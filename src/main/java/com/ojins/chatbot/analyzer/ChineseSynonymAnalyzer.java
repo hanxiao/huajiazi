@@ -1,11 +1,11 @@
 package com.ojins.chatbot.analyzer;
 
 import org.apache.lucene.analysis.*;
-import org.apache.lucene.analysis.cn.smart.HMMChineseTokenizer;
 import org.apache.lucene.analysis.en.EnglishMinimalStemFilter;
 import org.apache.lucene.analysis.synonym.SynonymFilterFactory;
 import org.apache.lucene.analysis.util.FilesystemResourceLoader;
 import org.apache.lucene.util.Version;
+import org.wltea.analyzer.lucene.IKTokenizer;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -53,7 +53,7 @@ public class ChineseSynonymAnalyzer extends Analyzer {
     }
 
     public Analyzer.TokenStreamComponents createComponents(String fieldName) {
-        Tokenizer tokenizer = new HMMChineseTokenizer();// IKTokenizer(false);
+        Tokenizer tokenizer = new IKTokenizer(true); //new HMMChineseTokenizer();//
         TokenStream result = new EnglishMinimalStemFilter(tokenizer);
         if (!this.stopWords.isEmpty()) {
             result = new StopFilter(result, this.stopWords);

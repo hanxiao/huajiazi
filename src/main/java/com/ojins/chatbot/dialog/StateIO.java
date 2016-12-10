@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.ojins.chatbot.util.CollectionAdapter;
-import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -33,8 +32,7 @@ public class StateIO {
     }
 
     public static void writeStatesToJson(Set<QAPair> states, String fp) {
-        try {
-            @Cleanup PrintWriter writer = new PrintWriter(new FileOutputStream(new File(fp), false));
+        try (PrintWriter writer = new PrintWriter(new FileOutputStream(new File(fp), false))) {
             writer.println(gson.toJson(states));
             writer.flush();
         } catch (Exception ex) {

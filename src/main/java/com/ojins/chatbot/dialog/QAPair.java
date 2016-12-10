@@ -27,7 +27,7 @@ public class QAPair {
     }
 
     public void incrementHitsByOne() {
-        this.hits++;
+        incrementHits(1);
     }
 
     public boolean isValid() {

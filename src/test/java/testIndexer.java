@@ -1,5 +1,5 @@
 import com.ojins.chatbot.dialog.QAPair;
-import com.ojins.chatbot.dialog.QAState;
+import com.ojins.chatbot.dialog.QAPairBuilder;
 import com.ojins.chatbot.dialog.StateIO;
 import com.ojins.chatbot.service.LuceneIndexer;
 import com.ojins.chatbot.service.LuceneIndexerBuilder;
@@ -20,7 +20,7 @@ public class testIndexer {
     private LuceneReader luceneReader;
 
     public testIndexer() throws FileNotFoundException {
-        Set<QAState> qaStates = StateIO.loadStatesFromJson("src/test/statedb-small.json");
+        Set<QAPair> qaStates = StateIO.loadStatesFromJson("src/test/statedb-small.json");
         luceneIndexer = new LuceneIndexerBuilder()
                 .setFilePath("index")
                 .setQaStates(qaStates)
@@ -39,7 +39,7 @@ public class testIndexer {
 
     @Test
     public void testAdding() {
-        luceneIndexer.addQAState(new QAState("世界上最伟大的国家是哪个国家", "中国"));
+        luceneIndexer.addQAState(new QAPairBuilder().setQuestion("世界上最伟大的国家是哪个国家").setAnswer("中国").build());
         getAnswerForQuestions(luceneReader, "谁是世界上最伟大的国家");
     }
 

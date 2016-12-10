@@ -1,4 +1,5 @@
-import com.ojins.chatbot.dialog.QAState;
+import com.ojins.chatbot.dialog.QAPair;
+import com.ojins.chatbot.dialog.QAPairBuilder;
 import com.ojins.chatbot.seq2seq.EncodedQASet;
 import com.ojins.chatbot.seq2seq.QAIterator;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
@@ -22,7 +23,6 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,10 +32,10 @@ import java.util.Set;
 public class testSeq2Seq {
     @Test
     public void testToyTraining() {
-        Set<QAState> qaStates = new HashSet<>();
-        qaStates.add(new QAState(Collections.singletonList("苹果好"), Collections.singletonList("橘子不好")));
-        qaStates.add(new QAState(Collections.singletonList("橘子好"), Collections.singletonList("苹果不好")));
-        qaStates.add(new QAState(Collections.singletonList("苹果不好"), Collections.singletonList("橘子好")));
+        Set<QAPair> qaStates = new HashSet<>();
+        qaStates.add(new QAPairBuilder().setQuestion("苹果好").setAnswer("橘子不好").build());
+        qaStates.add(new QAPairBuilder().setQuestion("橘子好").setAnswer("苹果不好").build());
+        qaStates.add(new QAPairBuilder().setQuestion("苹果不好").setAnswer("橘子好").build());
 
         EncodedQASet encodedQASet = new EncodedQASet(qaStates);
 

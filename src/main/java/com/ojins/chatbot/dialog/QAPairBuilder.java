@@ -12,7 +12,7 @@ public class QAPairBuilder {
     private String question;
     private Set<String> didYouMean;
     private Set<String> followUp;
-    private double score;
+    private double score = 0;
     private int hits = 1;
 
     public QAPair build() {

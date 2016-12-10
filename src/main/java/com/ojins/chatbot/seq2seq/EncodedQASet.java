@@ -3,7 +3,7 @@ package com.ojins.chatbot.seq2seq;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.ojins.chatbot.analyzer.ChineseSynonymAnalyzer;
-import com.ojins.chatbot.dialog.QAState;
+import com.ojins.chatbot.dialog.QAPair;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
@@ -64,20 +64,16 @@ public class EncodedQASet {
                 answers.size()));
     }
 
-    public EncodedQASet(Collection<QAState> qaStates) {
+    public EncodedQASet(Collection<QAPair> qaStates) {
         // first build dictionary
         qaStates.stream().forEach(p -> {
             try {
-                for (String q : p.getQuestions()) {
-                    int[] q_idx = EncodeSentence(q, true).stream().mapToInt(i -> i).toArray();
-                    maxQuestionLen = maxQuestionLen > q_idx.length ? maxQuestionLen : q_idx.length;
-                    for (String a : p.getAnswers()) {
-                        int[] a_idx = EncodeSentence(a, true).stream().mapToInt(i -> i).toArray();
-                        maxAnswerLen = maxAnswerLen > a_idx.length ? maxAnswerLen : a_idx.length;
-                        questions.add(q_idx);
-                        answers.add(a_idx);
-                    }
-                }
+                int[] q_idx = EncodeSentence(p.getQuestion(), true).stream().mapToInt(i -> i).toArray();
+                maxQuestionLen = maxQuestionLen > q_idx.length ? maxQuestionLen : q_idx.length;
+                int[] a_idx = EncodeSentence(p.getAnswer(), true).stream().mapToInt(i -> i).toArray();
+                maxAnswerLen = maxAnswerLen > a_idx.length ? maxAnswerLen : a_idx.length;
+                questions.add(q_idx);
+                answers.add(a_idx);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }

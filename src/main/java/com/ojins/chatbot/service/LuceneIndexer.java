@@ -30,17 +30,19 @@ public class LuceneIndexer {
     private Directory index;
     private IndexWriterConfig indexWriterConfig = new IndexWriterConfig(chineseAnalyzer);
 
-    public LuceneIndexer(Directory index, Set<QAPair> qaPairs, boolean append) {
+    public LuceneIndexer(Directory index, Set<QAPair> qaPairs, boolean overwrite) {
         this.index = index;
         try {
             IndexWriter w = new IndexWriter(index, indexWriterConfig);
-            if (!append) {
+            if (overwrite) {
                 w.deleteAll();
                 w.commit();
             }
             qaPairs.forEach(p -> {
-                indexQAState(w, p, false);
+                indexQAState(w, p, overwrite);
             });
+            w.forceMergeDeletes();
+            w.flush();
             w.commit();
             w.close();
         } catch (IOException ex) {
@@ -63,8 +65,6 @@ public class LuceneIndexer {
                 w.deleteDocuments(q);
             }
             w.addDocument(doc);
-            w.forceMergeDeletes();
-            w.flush();
         } catch (Exception e) {
             e.printStackTrace();
         }
