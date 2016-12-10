@@ -1,12 +1,11 @@
 import com.google.common.collect.Sets;
-import com.ojins.chatbot.dialog.QAPair;
 import com.ojins.chatbot.dialog.QAPairBuilder;
 import com.ojins.chatbot.dialog.StateIO;
+import lombok.val;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Set;
 
 /**
  * Created by han on 11/14/16.
@@ -14,18 +13,13 @@ import java.util.Set;
 public class testStateIO {
 
     @Test
-    public void testWrite() {
-        Set<QAPair> qaStates = Sets.newHashSet(new QAPairBuilder().setQuestion("测试问题1").setAnswer("回答").build(),
+    public void testWrite() throws IOException {
+        val fileName = "statedb-test.json";
+        val qaStates = Sets.newHashSet(
+                new QAPairBuilder().setQuestion("测试问题1").setAnswer("回答").build(),
                 new QAPairBuilder().setQuestion("测试问题2").setAnswer("回答").build());
 
-        StateIO.writeStatesToJson(qaStates, "statedb-test.json");
+        StateIO.writeStatesToJson(qaStates, fileName);
+        Assert.assertEquals(StateIO.loadStatesFromJson(fileName).size(), 2);
     }
-
-    @Test
-    public void testRead() throws IOException {
-        Set<QAPair> qaStates = StateIO.loadStatesFromJson("statedb-test.json");
-        Assert.assertEquals(qaStates.size(), 1);
-    }
-
-
 }

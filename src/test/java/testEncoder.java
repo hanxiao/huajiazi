@@ -5,7 +5,7 @@ import com.ojins.chatbot.seq2seq.EncodedQASet;
 import lombok.val;
 import org.junit.Test;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,7 +15,7 @@ import java.util.Set;
  */
 public class testEncoder {
     @Test
-    public void testEncoding() throws FileNotFoundException {
+    public void testEncoding() throws IOException {
         val qaStates = StateIO.loadStatesFromJson("src/test/statedb-small.json");
         EncodedQASet encodedQASet = new EncodedQASet(qaStates);
         encodedQASet.printSummary();

@@ -7,7 +7,6 @@ import com.ojins.chatbot.service.LuceneReader;
 import com.ojins.chatbot.service.LuceneReaderBuilder;
 import org.junit.Test;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
@@ -19,7 +18,7 @@ public class testIndexer {
     private LuceneIndexer luceneIndexer;
     private LuceneReader luceneReader;
 
-    public testIndexer() throws FileNotFoundException {
+    public testIndexer() throws IOException {
         Set<QAPair> qaStates = StateIO.loadStatesFromJson("src/test/statedb-small.json");
         luceneIndexer = new LuceneIndexerBuilder()
                 .setFilePath("index")

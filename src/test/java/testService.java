@@ -5,7 +5,6 @@ import com.ojins.chatbot.service.QAServiceBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Set;
@@ -17,7 +16,7 @@ public class testService {
     Set<QAPair> qaStates;
     QAService qaService;
 
-    public testService() throws FileNotFoundException {
+    public testService() throws IOException {
         qaStates = StateIO.loadStatesFromJson("src/test/statedb-small.json");
         qaService = new QAServiceBuilder()
                 .setQaStates(qaStates)
