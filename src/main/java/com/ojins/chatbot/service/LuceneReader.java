@@ -106,8 +106,9 @@ public class LuceneReader {
         Optional<QAPair> bestAnswer = answers.values().stream().max(Comparator.comparingDouble(QAPair::getScore));
         Set<String> didYouMean = answers.values().stream().map(QAPair::getQuestion).collect(Collectors.toSet());
         String bestAns = bestAnswer.get().getAnswer();
-        didYouMean.remove(bestAns);
-        answers.get(bestAns).setDidYouMean(didYouMean);
+        String bestQus = bestAnswer.get().getQuestion();
+        didYouMean.remove(bestQus);
+        if (!didYouMean.isEmpty()) answers.get(bestAns).setDidYouMean(didYouMean);
 
         return Optional.of(answers.get(bestAns));
     }

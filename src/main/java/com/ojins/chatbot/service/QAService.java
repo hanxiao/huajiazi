@@ -3,11 +3,11 @@ package com.ojins.chatbot.service;
 import com.ojins.chatbot.dialog.QAPair;
 import com.ojins.chatbot.dialog.QAPairBuilder;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,24 +24,21 @@ public class QAService {
 
     public QAService(Set<QAPair> qaStates, String topic, boolean overwrite) {
         curTopic = topic;
-        Path fp = Paths.get("index", topic);
+        val fp = Paths.get("index", topic);
+        val luceneIndexerBuilder = new LuceneIndexerBuilder()
+                .setFilePath(fp.toString())
+                .setOverwrite(overwrite)
+                .setQaStates(qaStates);
 
-        if (!Files.exists(fp) || overwrite) {
-            if (Files.exists(fp) && overwrite) {
-                log.info(String.format("topic: %s already exists, but I will overwrite it", topic));
-            } else if (!Files.exists(fp)) {
-                log.info(String.format("topic: %s not exists, I will create it", topic));
-            }
-            luceneIndexer = new LuceneIndexerBuilder()
-                    .setFilePath(fp.toString())
-                    .setQaStates(qaStates)
-                    .createLuceneIndexer();
-        } else {
+        if (Files.exists(fp) && overwrite) {
+            log.info(String.format("topic: %s already exists, but I will overwrite it", topic));
+        } else if (!Files.exists(fp)) {
+            log.info(String.format("topic: %s not exists, I will create it", topic));
+        } else if (Files.exists(fp) && !overwrite) {
             log.info(String.format("topic: %s already exists, will loading from it", topic));
-            luceneIndexer = new LuceneIndexerBuilder()
-                    .setFilePath(fp.toString())
-                    .createLuceneIndexer();
         }
+
+        luceneIndexer = luceneIndexerBuilder.createLuceneIndexer();
 
         luceneReader = new LuceneReaderBuilder()
                 .setIndexer(luceneIndexer)
@@ -99,13 +96,20 @@ public class QAService {
         return addQAPair(question, answer, false);
     }
 
-    public boolean addQAPair(String question, String answer, boolean update) {
-        return luceneIndexer.addQAState(
+    public boolean addQAPair(QAPair qaPair, boolean overwrite) {
+        return luceneIndexer.addQAPair(qaPair, overwrite);
+    }
+
+    public boolean addQAPair(QAPair qaPair) {
+        return luceneIndexer.addQAPair(qaPair, false);
+    }
+
+    public boolean addQAPair(String question, String answer, boolean overwrite) {
+        return luceneIndexer.addQAPair(
                 new QAPairBuilder()
                         .setQuestion(question)
                         .setAnswer(answer)
-                        .build()
-                , update);
+                        .build(), overwrite);
     }
 
     private void printServiceInfo() {

@@ -10,7 +10,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Set;
 
 /**
 
@@ -29,17 +28,18 @@ import java.util.Set;
 public class testEncoder {
     @Test
     public void testEncoding() throws IOException {
-        val qaStates = StateIO.loadStatesFromJson("src/test/statedb-small.json");
+        val fp = getClass().getClassLoader().getResource("test-load.json").getPath();
+        val qaStates = StateIO.loadStatesFromJson(fp);
         EncodedQASet encodedQASet = new EncodedQASet(qaStates);
         encodedQASet.printSummary();
-        System.out.println(Arrays.toString(encodedQASet.getEncodeSentence("德国博士咨询")));
-        System.out.println(encodedQASet.getDecodeSentence(new int[]{47, 48, 75}));
+        System.out.println(Arrays.toString(encodedQASet.getEncodeSentence("问题测试")));
+        System.out.println(encodedQASet.getDecodeSentence(new int[]{2, 1}));
     }
 
 
     @Test
     public void testSample() {
-        Set<QAPair> qaStates = new HashSet<>();
+        val qaStates = new HashSet<QAPair>();
         qaStates.add(new QAPairBuilder().setQuestion("苹果好").setAnswer("橘子不好").build());
         qaStates.add(new QAPairBuilder().setQuestion("橘子好").setAnswer("苹果不好").build());
         qaStates.add(new QAPairBuilder().setQuestion("苹果不好").setAnswer("橘子好").build());

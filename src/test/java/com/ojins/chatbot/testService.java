@@ -1,15 +1,15 @@
 package com.ojins.chatbot;
 
-import com.ojins.chatbot.dialog.QAPair;
 import com.ojins.chatbot.dialog.StateIO;
 import com.ojins.chatbot.service.QAService;
 import com.ojins.chatbot.service.QAServiceBuilder;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Set;
 
 /**
  ___   ___  ________  ___   __      __     __   ________ ________  ______
@@ -22,12 +22,14 @@ import java.util.Set;
 
  * Created on 12/5/16.
  */
+
+@Slf4j
 public class testService {
-    Set<QAPair> qaStates;
-    QAService qaService;
+    private QAService qaService;
 
     public testService() throws IOException {
-        qaStates = StateIO.loadStatesFromJson("src/test/statedb-small.json");
+        val fp = getClass().getClassLoader().getResource("test-load.json").getPath();
+        val qaStates = StateIO.loadStatesFromJson(fp);
         qaService = new QAServiceBuilder()
                 .setQaStates(qaStates)
                 .setTopic("phd")
@@ -57,12 +59,9 @@ public class testService {
     @Test
     public void testMultipleQuestions() {
         qaService = QAService.selectTopic("phd").orElse(null);
-        System.out.println(qaService.getAnswer(new String[]{"申请步骤", "如何套磁"}));
-    }
-
-    @Test
-    public void testLoadFromPreviousIndex() throws IOException {
-        Assert.assertEquals(181, qaService.getNumDocs());
+        val answers = qaService.getAnswer(new String[]{"这是什么数据库?", "你的作者?"});
+        Assert.assertEquals(2, answers.size());
+        log.info(answers.toString());
     }
 
     @Test
@@ -72,8 +71,8 @@ public class testService {
                 .setOverwrite(true)
                 .createQAService();
         // default service has one default qastate
-        qaService.addQAPair("你好我好大家好", "知道了");
-        qaService.addQAPair("你好我好大家好", "知道了");
+        qaService.addQAPair("你好我好大家好", "知道了", false);
+        qaService.addQAPair("你好我好大家好", "知道了", false);
         Assert.assertEquals(3, qaService.getNumDocs());
 
         qaService.addQAPair("你好我好大家好", "知道了", true);
@@ -90,12 +89,12 @@ public class testService {
         qaService.addQAPair("新中国成立啦", "知道了", true);
         qaService.addQAPair("新中国成立了", "知道了", true);
         qaService.addQAPair("新中国", "知道了", true);
-        Assert.assertEquals(2, qaService.getNumDocs());
+        Assert.assertEquals(4, qaService.getNumDocs());
     }
 
     @Test
     public void testListingTopics() {
-        System.out.println(Arrays.toString(QAService.getAvailableTopics()));
+        log.info(Arrays.toString(QAService.getAvailableTopics()));
         Assert.assertTrue(QAService.getAvailableTopics().length > 0);
     }
 }

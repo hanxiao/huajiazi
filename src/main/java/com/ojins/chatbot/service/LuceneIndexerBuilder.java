@@ -21,7 +21,7 @@ import java.util.Set;
 public class LuceneIndexerBuilder {
     private Directory index = new RAMDirectory();
     private Set<QAPair> qaStates = new HashSet<>();
-    private boolean append = false;
+    private boolean overwrite = false;
 
     public LuceneIndexerBuilder setFilePath(String fp) {
         try {
@@ -33,7 +33,7 @@ public class LuceneIndexerBuilder {
     }
 
     public LuceneIndexer createLuceneIndexer() {
-        return new LuceneIndexer(index, qaStates, append);
+        return new LuceneIndexer(index, qaStates, overwrite);
     }
 
 }
