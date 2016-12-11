@@ -148,7 +148,7 @@ public class Main {
 
         after((request, response) -> {
             response.header("Content-Encoding", "gzip");
-            //qaServiceMap.values().forEach(QAService::printServiceInfo);
+            qaServiceMap.values().forEach(QAService::printServiceInfo);
         });
 
     }
