@@ -1,6 +1,6 @@
 package com.ojins.chatbot.service;
 
-import com.ojins.chatbot.analyzer.ChineseSynonymAnalyzer;
+import com.ojins.chatbot.analyzer.AnalyzerManager;
 import com.ojins.chatbot.model.QAPair;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -27,12 +27,12 @@ import java.util.Set;
 @Data
 public class LuceneIndexer {
 
-    private Analyzer chineseAnalyzer = new ChineseSynonymAnalyzer();
+    private Analyzer analyzer = AnalyzerManager.chineseIKSmartAnalyzer;
     private Directory index;
 
     public LuceneIndexer(Directory index, Set<QAPair> qaPairs, boolean overwrite) {
         this.index = index;
-        try (IndexWriter w = new IndexWriter(index, new IndexWriterConfig(chineseAnalyzer))) {
+        try (IndexWriter w = new IndexWriter(index, new IndexWriterConfig(analyzer))) {
             if (overwrite) {
                 w.deleteAll();
                 w.commit();
@@ -75,7 +75,7 @@ public class LuceneIndexer {
     }
 
     public boolean addQAPair(QAPair qaState, boolean overwrite) {
-        try (IndexWriter w = new IndexWriter(index, new IndexWriterConfig(chineseAnalyzer))) {
+        try (IndexWriter w = new IndexWriter(index, new IndexWriterConfig(analyzer))) {
             indexQAState(w, qaState, overwrite);
             w.commit();
             log.info("New QAPair is added: {}", qaState);

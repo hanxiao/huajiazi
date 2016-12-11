@@ -2,7 +2,7 @@ package com.ojins.chatbot.seq2seq;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.ojins.chatbot.analyzer.ChineseSynonymAnalyzer;
+import com.ojins.chatbot.analyzer.AnalyzerManager;
 import com.ojins.chatbot.model.QAPair;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
@@ -30,7 +30,7 @@ public class EncodedQASet {
     private BiMap<Integer, String> idx2word;
     private List<int[]> questions = new ArrayList<>();
     private List<int[]> answers = new ArrayList<>();
-    private Analyzer analyzer = new ChineseSynonymAnalyzer(false, false);
+    private Analyzer analyzer = AnalyzerManager.chinesePlainAnalyzer;
     private int wIdx = 1; // 0 is reserved for SPACE/END
 
     public EncodedQASet(Collection<QAPair> qaStates) {
