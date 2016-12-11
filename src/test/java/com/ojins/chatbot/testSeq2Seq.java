@@ -57,8 +57,8 @@ public class TestSeq2Seq {
 
         //Tweak these to tune - dataset size = batchSize * totalBatches
         final int batchSize = 10;
-        final int totalBatches = 100;
-        final int nEpochs = 50;
+        final int totalBatches = 2;
+        final int nEpochs = 2;
         final int nIterations = 1;
         final int numHiddenNodes = 128;
 
