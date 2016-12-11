@@ -23,11 +23,11 @@ import java.util.HashSet;
  * <p>
  * Created on 11/22/16.
  */
-public class testEncoder {
+public class TestEncoder {
     @Test
     public void testEncoding() throws IOException {
         val fp = getClass().getClassLoader().getResource("test-load.json").getPath();
-        val qaStates = QAPair.loadStatesFromFile(fp);
+        val qaStates = QAPair.fromJsonFile(fp);
         EncodedQASet encodedQASet = new EncodedQASet(qaStates);
         encodedQASet.printSummary();
         System.out.println(Arrays.toString(encodedQASet.getEncodeSentence("问题测试")));

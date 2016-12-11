@@ -6,6 +6,7 @@ import com.ojins.chatbot.model.QAPair;
 import com.ojins.chatbot.model.QAPairBuilder;
 import com.ojins.chatbot.service.QAService;
 import com.ojins.chatbot.service.QAServiceBuilder;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static spark.Spark.*;
@@ -31,11 +33,11 @@ import static spark.Spark.*;
  * Created on 11/12/16.
  */
 
+@Data
 @Slf4j
-public class QAMain {
+public class QAController {
 
-    public static final int SERVER_PORT = 9090;
-    public static final int NUM_THREAD = 4;
+    private static final Gson gson = new Gson();
     private static final String CORS_ORIGIN = "*";
     private static final String CORS_METHODS = "GET, POST, OPTIONS, PUT, PATCH, DELETE";
     private static final String CORS_HEADERS = "Origin, X-Requested-With, Content-Type, Accept, Authorization";
@@ -45,12 +47,17 @@ public class QAMain {
 
     private static Map<String, QAService> qaServiceMap;
 
-    public QAMain(boolean overwrite) {
-        Gson gson = new Gson();
+    public QAController(Set<String> newTopics, boolean overwrite, int serverPort, int numThread) {
+        initQAService(newTopics, overwrite);
+        initWebService(serverPort, numThread);
+        initRouter();
+    }
 
-        initQAService(overwrite);
-        initWebService();
+    public static void main(final String[] args) throws IOException {
+        new QAControllerBuilder().build();
+    }
 
+    private void initRouter() {
         get("/topic",
                 (req, res) -> QAService.getAvailableTopics(), gson::toJson);
 
@@ -100,14 +107,11 @@ public class QAMain {
                 gson::toJson);
     }
 
-    public static void main(final String[] args) throws IOException {
-        new QAMain(true);
-    }
-
-    public void initQAService(boolean overwrite) {
+    public void initQAService(Set<String> newTopics, boolean overwrite) {
         // add all exisiting
         val availableTopics = Sets.newHashSet(QAService.getAvailableTopics());
         availableTopics.add("default");
+        if (newTopics != null) availableTopics.addAll(newTopics);
 
         qaServiceMap = availableTopics.stream().collect(
                 Collectors.toMap(
@@ -118,9 +122,9 @@ public class QAMain {
                                 .createQAService()));
     }
 
-    private void initWebService() {
-        port(SERVER_PORT); // Spark will run on port 9090
-        threadPool(NUM_THREAD);
+    private void initWebService(int serverPort, int numThread) {
+        port(serverPort); // Spark will run on port 9090
+        threadPool(numThread);
         enableCORS(CORS_ORIGIN, CORS_METHODS, CORS_HEADERS);
     }
 
