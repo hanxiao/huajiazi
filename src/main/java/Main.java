@@ -1,11 +1,12 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
-import com.ojins.chatbot.dialog.QAPair;
-import com.ojins.chatbot.dialog.QAPairBuilder;
+import com.ojins.chatbot.model.QAPair;
+import com.ojins.chatbot.model.QAPairBuilder;
 import com.ojins.chatbot.service.QAService;
 import com.ojins.chatbot.service.QAServiceBuilder;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +14,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static spark.Spark.*;
@@ -41,15 +41,14 @@ public class Main {
     private static final String CORS_ORIGIN = "*";
     private static final String CORS_METHODS = "GET, POST, OPTIONS, PUT, PATCH, DELETE";
     private static final String CORS_HEADERS = "Origin, X-Requested-With, Content-Type, Accept, Authorization";
-
-    private static Map<String, QAService> qaServiceMap;
     private static final QAPair fallbackUnknown = new QAPairBuilder()
             .setAnswer("这个问题我现在没法回答……不过我已经记下啦, 过一会儿回答你。")
             .build();
+    private static Map<String, QAService> qaServiceMap;
 
     public static void initQAService() {
         // add all exisiting
-        Set<String> availableTopics = Sets.newHashSet(QAService.getAvailableTopics());
+        val availableTopics = Sets.newHashSet(QAService.getAvailableTopics());
         availableTopics.add("default");
 
         qaServiceMap = availableTopics.stream().collect(
@@ -57,7 +56,7 @@ public class Main {
                         s -> s,
                         s -> new QAServiceBuilder()
                                 .setTopic(s)
-                                .setOverwrite(false)
+                                .setOverwrite(true)
                                 .createQAService()));
     }
 
@@ -67,19 +66,17 @@ public class Main {
         initQAService();
         initWebService();
 
-
         get("/topic",
                 (req, res) -> QAService.getAvailableTopics(), gson::toJson);
 
         get("/:topic/size",
-                (req, res) -> qaServiceMap.getOrDefault(req.params(":topic"),
-                        qaServiceMap.get("default")).getNumDocs(),
+                (req, res) -> QAService.selectTopic(qaServiceMap, req.params(":topic")).getNumDocs(),
                 gson::toJson);
 
         get("/:topic/unsolved",
                 (req, res) -> {
-                    Optional<List<QAPair>> unsolved = qaServiceMap.getOrDefault(req.params(":topic"),
-                            qaServiceMap.get("default")).getUnsolved();
+                    Optional<List<QAPair>> unsolved = QAService.selectTopic(qaServiceMap, req.params(":topic"))
+                            .getUnsolved();
                     if (unsolved.isPresent()) {
                         return unsolved.get();
                     }
@@ -90,14 +87,13 @@ public class Main {
 
         get("/:topic/:quest",
                 (req, res) -> {
-                    Optional<QAPair> answer = qaServiceMap.getOrDefault(req.params(":topic"),
-                            qaServiceMap.get("default")).getAnswer(req.params(":quest"));
+                    Optional<QAPair> answer = QAService.selectTopic(qaServiceMap, req.params(":topic"))
+                            .getAnswer(req.params(":quest"));
                     if (answer.isPresent()) {
                         res.status(200);
                         return answer.get();
                     }
-                    qaServiceMap
-                            .getOrDefault(req.params(":topic"), qaServiceMap.get("default"))
+                    QAService.selectTopic(qaServiceMap, req.params(":topic"))
                             .addQAPair(req.params(":quest"), "UNSOLVED", true);
                     res.status(202);
                     return fallbackUnknown;
@@ -112,9 +108,7 @@ public class Main {
                         res.status(400);
                         return "";
                     }
-                    qaServiceMap
-                            .getOrDefault(req.params(":topic"), qaServiceMap.get("default"))
-                            .addQAPair(creation.getQuestion(), creation.getAnswer());
+                    QAService.selectTopic(qaServiceMap, req.params(":topic")).addQAPair(creation);
                     res.status(201);
                     return "";
                 },

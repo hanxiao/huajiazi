@@ -1,7 +1,7 @@
 package com.ojins.chatbot.service;
 
-import com.ojins.chatbot.dialog.QAPair;
-import com.ojins.chatbot.dialog.QAPairBuilder;
+import com.ojins.chatbot.model.QAPair;
+import com.ojins.chatbot.model.QAPairBuilder;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -47,18 +47,13 @@ public class QAService {
         printServiceInfo();
     }
 
-    public int getNumDocs() {
-        try {
-            return luceneReader.getNumDocs();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return 0;
-        }
-    }
-
     public static String[] getAvailableTopics() {
         File file = new File("index/");
         return file.list((current, name) -> new File(current, name).isDirectory());
+    }
+
+    public static QAService selectTopic(Map<String, QAService> qaServiceMap, String topic) {
+        return qaServiceMap.getOrDefault(topic, qaServiceMap.get("default"));
     }
 
     public static Optional<QAService> selectTopic(String topic) {
@@ -67,6 +62,15 @@ public class QAService {
         } else {
             log.warn(String.format("Do not support topic %s", topic));
             return Optional.empty();
+        }
+    }
+
+    public int getNumDocs() {
+        try {
+            return luceneReader.getNumDocs();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return 0;
         }
     }
 

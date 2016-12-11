@@ -1,6 +1,6 @@
 package com.ojins.chatbot.service;
 
-import com.ojins.chatbot.dialog.QAPair;
+import com.ojins.chatbot.model.QAPair;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.apache.lucene.store.Directory;

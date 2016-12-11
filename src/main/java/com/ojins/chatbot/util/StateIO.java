@@ -1,9 +1,9 @@
-package com.ojins.chatbot.dialog;
+package com.ojins.chatbot.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.ojins.chatbot.util.CollectionAdapter;
+import com.ojins.chatbot.model.QAPair;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;

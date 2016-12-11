@@ -1,7 +1,7 @@
 package com.ojins.chatbot;
 
-import com.ojins.chatbot.dialog.QAPair;
-import com.ojins.chatbot.dialog.QAPairBuilder;
+import com.ojins.chatbot.model.QAPair;
+import com.ojins.chatbot.model.QAPairBuilder;
 import com.ojins.chatbot.seq2seq.EncodedQASet;
 import com.ojins.chatbot.seq2seq.QAIterator;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;

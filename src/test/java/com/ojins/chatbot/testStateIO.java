@@ -1,8 +1,8 @@
 package com.ojins.chatbot;
 
 import com.google.common.collect.Sets;
-import com.ojins.chatbot.dialog.QAPairBuilder;
-import com.ojins.chatbot.dialog.StateIO;
+import com.ojins.chatbot.model.QAPairBuilder;
+import com.ojins.chatbot.util.StateIO;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.Assert;

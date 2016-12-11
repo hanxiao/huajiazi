@@ -1,9 +1,9 @@
 package com.ojins.chatbot;
 
-import com.ojins.chatbot.dialog.QAPair;
-import com.ojins.chatbot.dialog.QAPairBuilder;
-import com.ojins.chatbot.dialog.StateIO;
+import com.ojins.chatbot.model.QAPair;
+import com.ojins.chatbot.model.QAPairBuilder;
 import com.ojins.chatbot.seq2seq.EncodedQASet;
+import com.ojins.chatbot.util.StateIO;
 import lombok.val;
 import org.junit.Test;
 

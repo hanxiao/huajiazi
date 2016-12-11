@@ -1,7 +1,7 @@
 package com.ojins.chatbot.service;
 
 import com.ojins.chatbot.analyzer.ChineseSynonymAnalyzer;
-import com.ojins.chatbot.dialog.QAPair;
+import com.ojins.chatbot.model.QAPair;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.analysis.Analyzer;

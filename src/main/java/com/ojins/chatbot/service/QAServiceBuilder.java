@@ -1,8 +1,8 @@
 package com.ojins.chatbot.service;
 
 import com.google.common.collect.Sets;
-import com.ojins.chatbot.dialog.QAPair;
-import com.ojins.chatbot.dialog.QAPairBuilder;
+import com.ojins.chatbot.model.QAPair;
+import com.ojins.chatbot.model.QAPairBuilder;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 

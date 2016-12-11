@@ -1,7 +1,7 @@
 package com.ojins.chatbot.service;
 
-import com.ojins.chatbot.dialog.QAPair;
-import com.ojins.chatbot.dialog.QAPairBuilder;
+import com.ojins.chatbot.model.QAPair;
+import com.ojins.chatbot.model.QAPairBuilder;
 import com.ojins.chatbot.util.HelperFunction;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

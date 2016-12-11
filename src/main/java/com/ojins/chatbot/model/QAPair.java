@@ -1,4 +1,4 @@
-package com.ojins.chatbot.dialog;
+package com.ojins.chatbot.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
