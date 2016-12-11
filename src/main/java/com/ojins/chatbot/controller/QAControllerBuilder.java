@@ -24,7 +24,7 @@ public class QAControllerBuilder {
     private Set<String> newTopics;
     private boolean overwrite = true;
     private int serverPort = 9090;
-    private int numThread = 4;
+    private int numThread = 10;
 
     public QAController build() {
         return new QAController(newTopics, overwrite, serverPort, numThread);
