@@ -50,6 +50,7 @@ public class QAService {
     }
 
     public static String[] getAvailableTopics() {
+        new File("index/").mkdirs();
         File file = new File("index/");
         return file.list((current, name) -> new File(current, name).isDirectory());
     }
