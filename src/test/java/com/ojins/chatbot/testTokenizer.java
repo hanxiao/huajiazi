@@ -1,7 +1,6 @@
 package com.ojins.chatbot;
 
 import com.ojins.chatbot.analyzer.AnalyzerManager;
-import com.ojins.chatbot.util.HelperFunction;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.lucene.analysis.Analyzer;
@@ -26,7 +25,7 @@ import static com.ojins.chatbot.analyzer.AnalyzerManager.chineseIKSmartAnalyzer;
  * Created on 11/14/16.
  */
 @Slf4j
-public class testTokenizer {
+public class TestTokenizer {
 
     @Test
     public void testSomeInstances() {
@@ -38,7 +37,7 @@ public class testTokenizer {
 
         for (String s : sent) {
             for (Analyzer a : analyzer) {
-                val strings = HelperFunction.getTokenizerResult(s, a);
+                val strings = AnalyzerManager.getTokenizerResult(s, a);
                 if (strings.isPresent()) log.info("{}", String.join("|", strings.get()));
             }
         }
@@ -50,7 +49,7 @@ public class testTokenizer {
         String[] sent = {"你好啊!", "你好么?", "你！！！好啊！！！"};
 
         for (String s : sent) {
-            val strings = HelperFunction.getTokenizerResult(s, AnalyzerManager.chineseIKSmartAnalyzer);
+            val strings = AnalyzerManager.getTokenizerResult(s, AnalyzerManager.chineseIKSmartAnalyzer);
             if (strings.isPresent()) log.info(String.join("|", strings.get()));
 
         }

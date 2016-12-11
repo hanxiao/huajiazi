@@ -23,12 +23,12 @@ import java.io.IOException;
  */
 
 @Slf4j
-public class testStateIO {
+public class TestJsonIO {
 
     @Test
     public void testRead() throws IOException {
         val fileName = getClass().getClassLoader().getResource("test-load.json").getPath();
-        val qaStates = QAPair.loadStatesFromFile(fileName);
+        val qaStates = QAPair.fromJsonFile(fileName);
         Assert.assertEquals(Sets.newHashSet(
                 new QAPairBuilder().setQuestion("测试问题1").setAnswer("回答").setHits(0).build()), qaStates);
     }
@@ -41,7 +41,7 @@ public class testStateIO {
                 new QAPairBuilder().setQuestion("测试问题2").setAnswer("回答").build());
 
         val fileName = getClass().getClassLoader().getResource("test-write-load.json").getPath();
-        QAPair.writeStatesToFile(qaStates, fileName);
-        Assert.assertEquals(2, QAPair.loadStatesFromFile(fileName).size());
+        QAPair.toJsonFile(qaStates, fileName);
+        Assert.assertEquals(2, QAPair.fromJsonFile(fileName).size());
     }
 }

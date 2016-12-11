@@ -34,26 +34,30 @@ public class QAPair {
     double score;
     int hits;
 
-    public static Set<QAPair> loadStatesFromFile(String fp) throws IOException {
+    public static Set<QAPair> fromJsonFile(String fp) throws IOException {
         val content = new String(Files.readAllBytes(Paths.get(fp)));
         Type setType = new TypeToken<Set<QAPair>>() {
         }.getType();
         return gson.fromJson(content, setType);
     }
 
-    public static QAPair buildStateFromJson(String json) {
+    public static QAPair fromJson(String json) {
         Type setType = new TypeToken<QAPair>() {
         }.getType();
         return gson.fromJson(json, setType);
     }
 
-    public static void writeStatesToFile(Set<QAPair> states, String fp) {
+    public static void toJsonFile(Set<QAPair> states, String fp) {
         try (PrintWriter writer = new PrintWriter(new FileOutputStream(new File(fp), false))) {
             writer.println(gson.toJson(states));
             writer.flush();
         } catch (Exception ex) {
             log.error("Something wrong when writing states to the file", ex);
         }
+    }
+
+    public String toJson() {
+        return gson.toJson(this);
     }
 
     public void incrementScore(double delta) {

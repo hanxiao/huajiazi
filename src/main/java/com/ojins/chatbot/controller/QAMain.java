@@ -1,3 +1,5 @@
+package com.ojins.chatbot.controller;
+
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.ojins.chatbot.model.QAPair;
@@ -30,8 +32,10 @@ import static spark.Spark.*;
  */
 
 @Slf4j
-public class Main {
+public class QAMain {
 
+    public static final int SERVER_PORT = 9090;
+    public static final int NUM_THREAD = 4;
     private static final String CORS_ORIGIN = "*";
     private static final String CORS_METHODS = "GET, POST, OPTIONS, PUT, PATCH, DELETE";
     private static final String CORS_HEADERS = "Origin, X-Requested-With, Content-Type, Accept, Authorization";
@@ -41,24 +45,10 @@ public class Main {
 
     private static Map<String, QAService> qaServiceMap;
 
-    public static void initQAService() {
-        // add all exisiting
-        val availableTopics = Sets.newHashSet(QAService.getAvailableTopics());
-        availableTopics.add("default");
-
-        qaServiceMap = availableTopics.stream().collect(
-                Collectors.toMap(
-                        s -> s,
-                        s -> new QAServiceBuilder()
-                                .setTopic(s)
-                                .setOverwrite(true)
-                                .createQAService()));
-    }
-
-    public static void main(final String[] args) throws IOException {
+    public QAMain(boolean overwrite) {
         Gson gson = new Gson();
 
-        initQAService();
+        initQAService(overwrite);
         initWebService();
 
         get("/topic",
@@ -97,7 +87,7 @@ public class Main {
 
         post("/teach",
                 (req, res) -> {
-                    QAPair qa = QAPair.buildStateFromJson(req.body());
+                    QAPair qa = QAPair.fromJson(req.body());
                     if (!qa.isValid()) {
                         log.warn("invalid QAPair: {}", req.body());
                         res.status(400);
@@ -110,14 +100,32 @@ public class Main {
                 gson::toJson);
     }
 
-    private static void initWebService() {
-        port(9090); // Spark will run on port 9090
-        threadPool(4);
+    public static void main(final String[] args) throws IOException {
+        new QAMain(true);
+    }
+
+    public void initQAService(boolean overwrite) {
+        // add all exisiting
+        val availableTopics = Sets.newHashSet(QAService.getAvailableTopics());
+        availableTopics.add("default");
+
+        qaServiceMap = availableTopics.stream().collect(
+                Collectors.toMap(
+                        s -> s,
+                        s -> new QAServiceBuilder()
+                                .setTopic(s)
+                                .setOverwrite(overwrite)
+                                .createQAService()));
+    }
+
+    private void initWebService() {
+        port(SERVER_PORT); // Spark will run on port 9090
+        threadPool(NUM_THREAD);
         enableCORS(CORS_ORIGIN, CORS_METHODS, CORS_HEADERS);
     }
 
     // Enables CORS on requests. This method is an initialization method and should be called once.
-    private static void enableCORS(final String origin, final String methods, final String headers) {
+    private void enableCORS(final String origin, final String methods, final String headers) {
 
         options("/*", (request, response) -> {
 

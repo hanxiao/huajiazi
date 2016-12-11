@@ -41,7 +41,7 @@ import java.util.Set;
  * <p>
  * Created on 11/23/16.
  */
-public class testSeq2Seq {
+public class TestSeq2Seq {
     @Test
     public void testToyTraining() {
         Set<QAPair> qaStates = new HashSet<>();

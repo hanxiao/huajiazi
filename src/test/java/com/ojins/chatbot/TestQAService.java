@@ -24,12 +24,12 @@ import java.util.Arrays;
  */
 
 @Slf4j
-public class testService {
+public class TestQAService {
     private QAService qaService;
 
-    public testService() throws IOException {
+    public TestQAService() throws IOException {
         val fp = getClass().getClassLoader().getResource("test-load.json").getPath();
-        val qaStates = QAPair.loadStatesFromFile(fp);
+        val qaStates = QAPair.fromJsonFile(fp);
         qaService = new QAServiceBuilder()
                 .setQaStates(qaStates)
                 .setTopic("phd")

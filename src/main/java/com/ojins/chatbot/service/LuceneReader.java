@@ -1,12 +1,11 @@
 package com.ojins.chatbot.service;
 
+import com.ojins.chatbot.analyzer.AnalyzerManager;
 import com.ojins.chatbot.model.QAPair;
 import com.ojins.chatbot.model.QAPairBuilder;
-import com.ojins.chatbot.util.HelperFunction;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
@@ -16,7 +15,6 @@ import org.apache.lucene.search.*;
 import org.apache.lucene.store.Directory;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -66,8 +64,7 @@ public class LuceneReader {
     }
 
     public Optional<QAPair> getAnswers(String question) throws IOException, ParseException {
-        TokenStream ts = chineseAnalyzer.tokenStream("myfield", new StringReader(question));
-        HelperFunction.getTokenizerResult(question, chineseAnalyzer);
+        AnalyzerManager.getTokenizerResult(question, chineseAnalyzer);
 
         Query q = new QueryParser("Question", chineseAnalyzer)
                 .parse(QueryParser.escape(question));
