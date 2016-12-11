@@ -29,8 +29,8 @@ public class testStateIO {
     public void testRead() throws IOException {
         val fileName = getClass().getClassLoader().getResource("test-load.json").getPath();
         val qaStates = QAPair.loadStatesFromFile(fileName);
-        Assert.assertEquals(qaStates,
-                Sets.newHashSet(new QAPairBuilder().setQuestion("测试问题1").setAnswer("回答").setHits(0).build()));
+        Assert.assertEquals(Sets.newHashSet(
+                new QAPairBuilder().setQuestion("测试问题1").setAnswer("回答").setHits(0).build()), qaStates);
     }
 
     @Test

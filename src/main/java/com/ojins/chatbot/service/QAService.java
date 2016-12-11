@@ -27,15 +27,16 @@ public class QAService {
         val fp = Paths.get("index", topic);
         val luceneIndexerBuilder = new LuceneIndexerBuilder()
                 .setFilePath(fp.toString())
-                .setOverwrite(overwrite)
-                .setQaStates(qaStates);
+                .setOverwrite(overwrite);
 
         if (Files.exists(fp) && overwrite) {
+            luceneIndexerBuilder.setQaStates(qaStates);
             log.info("topic: {} already exists, but I will overwrite it", topic);
         } else if (!Files.exists(fp)) {
-            log.info("topic: {} not exists, I will create it", topic);
+            luceneIndexerBuilder.setQaStates(qaStates);
+            log.info("I will create a new topic {}", topic);
         } else if (Files.exists(fp) && !overwrite) {
-            log.info("topic: {} already exists, will loading from it", topic);
+            log.info("topic: {} already exists, I will load it", topic);
         }
 
         luceneIndexer = luceneIndexerBuilder.createLuceneIndexer();
@@ -97,7 +98,7 @@ public class QAService {
     }
 
     public boolean addQAPair(String question, String answer) {
-        return addQAPair(question, answer, false);
+        return addQAPair(question, answer, true);
     }
 
     public boolean addQAPair(QAPair qaPair, boolean overwrite) {
@@ -105,7 +106,7 @@ public class QAService {
     }
 
     public boolean addQAPair(QAPair qaPair) {
-        return luceneIndexer.addQAPair(qaPair, false);
+        return luceneIndexer.addQAPair(qaPair, true);
     }
 
     public boolean addQAPair(String question, String answer, boolean overwrite) {
@@ -118,7 +119,7 @@ public class QAService {
 
     public void printServiceInfo() {
         try {
-            log.info("topic: {}\tdocs: {}", curTopic, luceneReader.getNumDocs());
+            log.info("topic: {}, docs: {}", curTopic, luceneReader.getNumDocs());
         } catch (IOException ex) {
             log.error("Something wrong when printing service info", ex);
         }

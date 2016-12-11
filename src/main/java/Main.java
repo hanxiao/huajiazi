@@ -56,7 +56,7 @@ public class Main {
                         s -> s,
                         s -> new QAServiceBuilder()
                                 .setTopic(s)
-                                .setOverwrite(true)
+                                .setOverwrite(false)
                                 .createQAService()));
     }
 
