@@ -34,7 +34,7 @@ public class testTokenizer {
 
         for (String s : sent) {
             val strings = HelperFunction.getTokenizerResult(s, analyzer);
-            if (strings.isPresent()) log.info(String.format("%s", String.join("|", strings.get())));
+            if (strings.isPresent()) log.info(String.join("|", strings.get()));
 
         }
     }

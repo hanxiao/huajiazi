@@ -1,8 +1,8 @@
 package com.ojins.chatbot;
 
 import com.google.common.collect.Sets;
+import com.ojins.chatbot.model.QAPair;
 import com.ojins.chatbot.model.QAPairBuilder;
-import com.ojins.chatbot.util.StateIO;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.Assert;
@@ -28,7 +28,7 @@ public class testStateIO {
     @Test
     public void testRead() throws IOException {
         val fileName = getClass().getClassLoader().getResource("test-load.json").getPath();
-        val qaStates = StateIO.loadStatesFromJson(fileName);
+        val qaStates = QAPair.loadStatesFromFile(fileName);
         Assert.assertEquals(qaStates,
                 Sets.newHashSet(new QAPairBuilder().setQuestion("测试问题1").setAnswer("回答").setHits(0).build()));
     }
@@ -41,7 +41,7 @@ public class testStateIO {
                 new QAPairBuilder().setQuestion("测试问题2").setAnswer("回答").build());
 
         val fileName = getClass().getClassLoader().getResource("test-write-load.json").getPath();
-        StateIO.writeStatesToJson(qaStates, fileName);
-        Assert.assertEquals(2, StateIO.loadStatesFromJson(fileName).size());
+        QAPair.writeStatesToFile(qaStates, fileName);
+        Assert.assertEquals(2, QAPair.loadStatesFromFile(fileName).size());
     }
 }

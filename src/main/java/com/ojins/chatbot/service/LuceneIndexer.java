@@ -44,8 +44,7 @@ public class LuceneIndexer {
             w.flush();
             w.commit();
         } catch (IOException ex) {
-            ex.printStackTrace();
-            log.error("something wrong when adding QAState");
+            log.error("something wrong when adding QAState", ex);
         }
     }
 
@@ -79,10 +78,10 @@ public class LuceneIndexer {
         try (IndexWriter w = new IndexWriter(index, new IndexWriterConfig(chineseAnalyzer))) {
             indexQAState(w, qaState, overwrite);
             w.commit();
+            log.info("New QAPair is added: {}", qaState);
             return true;
         } catch (IOException ex) {
-            ex.printStackTrace();
-            log.error("Something wrong when adding QAState");
+            log.error("Something wrong when adding QAState", ex);
             return false;
         }
     }

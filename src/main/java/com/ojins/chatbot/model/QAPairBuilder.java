@@ -8,14 +8,12 @@ import java.util.Set;
 @Accessors(chain = true)
 @Setter
 public class QAPairBuilder {
-    private String answer;
-    private String question;
-    private Set<String> didYouMean;
-    private Set<String> followUp;
+    private String answer, question, topic = "default";
+    private Set<String> didYouMean, followUp;
     private double score = 0;
     private int hits = 1;
 
     public QAPair build() {
-        return new QAPair(question, answer, didYouMean, followUp, score, hits);
+        return new QAPair(question, answer, topic, didYouMean, followUp, score, hits);
     }
 }

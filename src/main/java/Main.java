@@ -1,16 +1,16 @@
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.ojins.chatbot.model.QAPair;
 import com.ojins.chatbot.model.QAPairBuilder;
 import com.ojins.chatbot.service.QAService;
 import com.ojins.chatbot.service.QAServiceBuilder;
+import com.ojins.chatbot.util.CollectionAdapter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,14 +36,14 @@ import static spark.Spark.*;
 @Slf4j
 public class Main {
 
-    private static transient final Logger LOG = LoggerFactory.getLogger(Main.class);
-
     private static final String CORS_ORIGIN = "*";
     private static final String CORS_METHODS = "GET, POST, OPTIONS, PUT, PATCH, DELETE";
     private static final String CORS_HEADERS = "Origin, X-Requested-With, Content-Type, Accept, Authorization";
     private static final QAPair fallbackUnknown = new QAPairBuilder()
             .setAnswer("这个问题我现在没法回答……不过我已经记下啦, 过一会儿回答你。")
             .build();
+    private static Gson gson = new GsonBuilder()
+            .registerTypeHierarchyAdapter(Collection.class, new CollectionAdapter()).create();
     private static Map<String, QAService> qaServiceMap;
 
     public static void initQAService() {
@@ -100,15 +100,15 @@ public class Main {
                 },
                 gson::toJson);
 
-        post("/:topic/teach/",
+        post("/teach",
                 (req, res) -> {
-                    ObjectMapper mapper = new ObjectMapper();
-                    QAPair creation = mapper.readValue(req.body(), QAPair.class);
-                    if (!creation.isValid()) {
+                    QAPair qa = QAPair.buildStateFromJson(req.body());
+                    if (!qa.isValid()) {
+                        log.warn("invalid QAPair: {}", req.body());
                         res.status(400);
                         return "";
                     }
-                    QAService.selectTopic(qaServiceMap, req.params(":topic")).addQAPair(creation);
+                    QAService.selectTopic(qaServiceMap, qa.getTopic()).addQAPair(qa);
                     res.status(201);
                     return "";
                 },
@@ -149,6 +149,7 @@ public class Main {
 
         after((request, response) -> {
             response.header("Content-Encoding", "gzip");
+            //qaServiceMap.values().forEach(QAService::printServiceInfo);
         });
 
     }

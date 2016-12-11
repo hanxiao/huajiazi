@@ -31,11 +31,11 @@ public class QAService {
                 .setQaStates(qaStates);
 
         if (Files.exists(fp) && overwrite) {
-            log.info(String.format("topic: %s already exists, but I will overwrite it", topic));
+            log.info("topic: {} already exists, but I will overwrite it", topic);
         } else if (!Files.exists(fp)) {
-            log.info(String.format("topic: %s not exists, I will create it", topic));
+            log.info("topic: {} not exists, I will create it", topic);
         } else if (Files.exists(fp) && !overwrite) {
-            log.info(String.format("topic: %s already exists, will loading from it", topic));
+            log.info("topic: {} already exists, will loading from it", topic);
         }
 
         luceneIndexer = luceneIndexerBuilder.createLuceneIndexer();
@@ -60,7 +60,7 @@ public class QAService {
         if (new HashSet<>(Arrays.asList(getAvailableTopics())).contains(topic)) {
             return Optional.of(new QAServiceBuilder().setTopic(topic).createQAService());
         } else {
-            log.warn(String.format("Do not support topic %s", topic));
+            log.warn("Do not support topic {}", topic);
             return Optional.empty();
         }
     }
@@ -116,11 +116,11 @@ public class QAService {
                         .build(), overwrite);
     }
 
-    private void printServiceInfo() {
+    public void printServiceInfo() {
         try {
-            log.info(String.format("topic: %s;\tdocs: %d\n", curTopic, luceneReader.getNumDocs()));
+            log.info("topic: {}\tdocs: {}", curTopic, luceneReader.getNumDocs());
         } catch (IOException ex) {
-            ex.printStackTrace();
+            log.error("Something wrong when printing service info", ex);
         }
     }
 }

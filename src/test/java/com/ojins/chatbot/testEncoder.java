@@ -3,7 +3,6 @@ package com.ojins.chatbot;
 import com.ojins.chatbot.model.QAPair;
 import com.ojins.chatbot.model.QAPairBuilder;
 import com.ojins.chatbot.seq2seq.EncodedQASet;
-import com.ojins.chatbot.util.StateIO;
 import lombok.val;
 import org.junit.Test;
 
@@ -29,7 +28,7 @@ public class testEncoder {
     @Test
     public void testEncoding() throws IOException {
         val fp = getClass().getClassLoader().getResource("test-load.json").getPath();
-        val qaStates = StateIO.loadStatesFromJson(fp);
+        val qaStates = QAPair.loadStatesFromFile(fp);
         EncodedQASet encodedQASet = new EncodedQASet(qaStates);
         encodedQASet.printSummary();
         System.out.println(Arrays.toString(encodedQASet.getEncodeSentence("问题测试")));

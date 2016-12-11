@@ -94,7 +94,7 @@ public class EncodedQASet {
             if (idx2word.containsKey(j)) {
                 sent += idx2word.get(j) + " ";
             } else {
-                LOG.error(String.format("%d is out of idx2word map!", j));
+                LOG.error("{} is out of idx2word map!", j);
             }
         }
         return sent.trim();
@@ -118,7 +118,7 @@ public class EncodedQASet {
                 if (curIdx >= 0) {
                     encodedSent.add(curIdx);
                 } else {
-                    LOG.error(String.format("String: %s contains unknown words", s));
+                    LOG.error("String: {} contains unknown words", s);
                     throw new NoSuchElementException();
                 }
             }

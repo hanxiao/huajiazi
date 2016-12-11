@@ -1,8 +1,8 @@
 package com.ojins.chatbot;
 
+import com.ojins.chatbot.model.QAPair;
 import com.ojins.chatbot.service.QAService;
 import com.ojins.chatbot.service.QAServiceBuilder;
-import com.ojins.chatbot.util.StateIO;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.Assert;
@@ -29,7 +29,7 @@ public class testService {
 
     public testService() throws IOException {
         val fp = getClass().getClassLoader().getResource("test-load.json").getPath();
-        val qaStates = StateIO.loadStatesFromJson(fp);
+        val qaStates = QAPair.loadStatesFromFile(fp);
         qaService = new QAServiceBuilder()
                 .setQaStates(qaStates)
                 .setTopic("phd")
