@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class QAService {
+    public static String UNSOLVED_MARKER = "unsolved";
     private LuceneIndexer luceneIndexer;
     private LuceneReader luceneReader;
     private String curTopic;

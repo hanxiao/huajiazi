@@ -1,16 +1,13 @@
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.ojins.chatbot.model.QAPair;
 import com.ojins.chatbot.model.QAPairBuilder;
 import com.ojins.chatbot.service.QAService;
 import com.ojins.chatbot.service.QAServiceBuilder;
-import com.ojins.chatbot.util.CollectionAdapter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -41,8 +38,7 @@ public class Main {
     private static final QAPair fallbackUnknown = new QAPairBuilder()
             .setAnswer("这个问题我现在没法回答……不过我已经记下啦, 过一会儿回答你。")
             .build();
-    private static Gson gson = new GsonBuilder()
-            .registerTypeHierarchyAdapter(Collection.class, new CollectionAdapter()).create();
+
     private static Map<String, QAService> qaServiceMap;
 
     public static void initQAService() {
@@ -55,7 +51,7 @@ public class Main {
                         s -> s,
                         s -> new QAServiceBuilder()
                                 .setTopic(s)
-                                .setOverwrite(false)
+                                .setOverwrite(true)
                                 .createQAService()));
     }
 
@@ -93,7 +89,7 @@ public class Main {
                         return answer.get();
                     }
                     QAService.selectTopic(qaServiceMap, req.params(":topic"))
-                            .addQAPair(req.params(":quest"), "UNSOLVED", true);
+                            .addQAPair(req.params(":quest"), QAService.UNSOLVED_MARKER, true);
                     res.status(202);
                     return fallbackUnknown;
                 },

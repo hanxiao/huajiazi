@@ -33,7 +33,7 @@ public class LuceneReader {
     private int numAnswer;
 
     Optional<List<QAPair>> getUnsolved() throws IOException, ParseException {
-        TermQuery term1 = new TermQuery(new Term("Answer", "unsolved"));
+        TermQuery term1 = new TermQuery(new Term("Answer", QAService.UNSOLVED_MARKER));
         Query q = new BooleanQuery.Builder()
                 .add(term1, BooleanClause.Occur.MUST)
                 .build();
@@ -81,7 +81,7 @@ public class LuceneReader {
         for (ScoreDoc h : hits) {
             String curAnswer = searcher.doc(h.doc).get("Answer");
             String curQuestion = searcher.doc(h.doc).get("Question");
-            if (curAnswer.startsWith("UNSOLVED")) {
+            if (curAnswer.startsWith(QAService.UNSOLVED_MARKER)) {
                 continue;
             }
             if (answers.containsKey(curAnswer)) {
