@@ -99,7 +99,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.0.2</version>
                 <configuration>
-                    <finalName>huaxiazi</finalName>
+                    <finalName>huajiazi-core</finalName>
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
@@ -127,7 +127,7 @@
                         </goals>
                         <phase>package</phase>
                         <configuration>
-                            <finalName>huaxiazi</finalName>
+                            <finalName>huajiazi-core</finalName>
                             <descriptorRefs>
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
                             </descriptorRefs>
