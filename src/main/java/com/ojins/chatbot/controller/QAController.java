@@ -1,13 +1,14 @@
-import com.fasterxml.jackson.databind.ObjectMapper;
+package com.ojins.chatbot.controller;
+
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
-import com.ojins.chatbot.dialog.QAResult;
-import com.ojins.chatbot.dialog.QAResultBuilder;
-import com.ojins.chatbot.response.NewQA;
+import com.ojins.chatbot.model.QAPair;
+import com.ojins.chatbot.model.QAPairBuilder;
 import com.ojins.chatbot.service.QAService;
 import com.ojins.chatbot.service.QAServiceBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,54 +20,55 @@ import java.util.stream.Collectors;
 import static spark.Spark.*;
 
 /**
- * Created by han on 11/12/16.
+ * ___   ___  ________  ___   __      __     __   ________ ________  ______
+ * /__/\ /__/\/_______/\/__/\ /__/\   /__/\ /__/\ /_______//_______/\/_____/\
+ * \::\ \\  \ \::: _  \ \::\_\\  \ \  \ \::\\:.\ \\__.::._\\::: _  \ \:::_ \ \
+ * \::\/_\ .\ \::(_)  \ \:. `-\  \ \  \_\::_\:_\/   \::\ \ \::(_)  \ \:\ \ \ \
+ * \:: ___::\ \:: __  \ \:. _    \ \   _\/__\_\_/\ _\::\ \_\:: __  \ \:\ \ \ \
+ * \: \ \\::\ \:.\ \  \ \. \`-\  \ \  \ \ \ \::\ /__\::\__/\:.\ \  \ \:\_\ \ \
+ * \__\/ \::\/\__\/\__\/\__\/ \__\/   \_\/  \__\\________\/\__\/\__\/\_____\/
+ * <p>
+ * <p>
+ * <p>
+ * Created on 11/12/16.
  */
-public class Main {
 
-    private static transient final Logger LOG = LoggerFactory.getLogger(Main.class);
+@Data
+@Slf4j
+public class QAController {
 
+    private static final Gson gson = new Gson();
     private static final String CORS_ORIGIN = "*";
     private static final String CORS_METHODS = "GET, POST, OPTIONS, PUT, PATCH, DELETE";
     private static final String CORS_HEADERS = "Origin, X-Requested-With, Content-Type, Accept, Authorization";
+    private static final QAPair fallbackUnknown = new QAPairBuilder()
+            .setAnswer("这个问题我现在没法回答……不过我已经记下啦, 过一会儿回答你。")
+            .build();
 
     private static Map<String, QAService> qaServiceMap;
-    private static final QAResult fallbackUnknown = new QAResultBuilder()
-            .setAnswer("这个问题我现在没法回答……不过我已经记下啦, 过一会儿回答你。")
-            .createQAResult();
 
-    public static void initQAService() {
-        // add all exisiting
-        Set<String> availableTopics = Sets.newHashSet(QAService.getAvailableTopics());
-        availableTopics.add("default");
-
-        qaServiceMap = availableTopics.stream().collect(
-                Collectors.toMap(
-                        s -> s,
-                        s -> new QAServiceBuilder()
-                                .setTopic(s)
-                                .setOverwrite(false)
-                                .createQAService()));
+    public QAController(Set<String> newTopics, boolean overwrite, int serverPort, int numThread) {
+        initQAService(newTopics, overwrite);
+        initWebService(serverPort, numThread);
+        initRouter();
     }
 
     public static void main(final String[] args) throws IOException {
-        Gson gson = new Gson();
+        new QAControllerBuilder().build();
+    }
 
-        initQAService();
-        initWebService();
-
-
+    private void initRouter() {
         get("/topic",
                 (req, res) -> QAService.getAvailableTopics(), gson::toJson);
 
         get("/:topic/size",
-                (req, res) -> qaServiceMap.getOrDefault(req.params(":topic"),
-                        qaServiceMap.get("default")).getNumDocs(),
+                (req, res) -> QAService.selectTopic(qaServiceMap, req.params(":topic")).getNumDocs(),
                 gson::toJson);
 
         get("/:topic/unsolved",
                 (req, res) -> {
-                    Optional<List<QAResult>> unsolved = qaServiceMap.getOrDefault(req.params(":topic"),
-                            qaServiceMap.get("default")).getUnsolved();
+                    Optional<List<QAPair>> unsolved = QAService.selectTopic(qaServiceMap, req.params(":topic"))
+                            .getUnsolved();
                     if (unsolved.isPresent()) {
                         return unsolved.get();
                     }
@@ -77,45 +79,57 @@ public class Main {
 
         get("/:topic/:quest",
                 (req, res) -> {
-                    Optional<QAResult> answer = qaServiceMap.getOrDefault(req.params(":topic"),
-                            qaServiceMap.get("default")).getAnswer(req.params(":quest"));
+                    Optional<QAPair> answer = QAService.selectTopic(qaServiceMap, req.params(":topic"))
+                            .getAnswer(req.params(":quest"));
                     if (answer.isPresent()) {
                         res.status(200);
                         return answer.get();
                     }
-                    qaServiceMap
-                            .getOrDefault(req.params(":topic"), qaServiceMap.get("default"))
-                            .addQAPair(req.params(":quest"), "UNSOLVED", true);
+                    QAService.selectTopic(qaServiceMap, req.params(":topic"))
+                            .addQAPair(req.params(":quest"), QAService.UNSOLVED_MARKER, true);
                     res.status(202);
                     return fallbackUnknown;
                 },
                 gson::toJson);
 
-        post("/:topic/teach/",
+        post("/teach",
                 (req, res) -> {
-                    ObjectMapper mapper = new ObjectMapper();
-                    NewQA creation = mapper.readValue(req.body(), NewQA.class);
-                    if (!creation.isValid()) {
+                    QAPair qa = QAPair.fromJson(req.body());
+                    if (!qa.isValid()) {
+                        log.warn("invalid QAPair: {}", req.body());
                         res.status(400);
                         return "";
                     }
-                    qaServiceMap
-                            .getOrDefault(req.params(":topic"), qaServiceMap.get("default"))
-                            .addQAPair(creation.getQuestion(), creation.getAnswer());
+                    QAService.selectTopic(qaServiceMap, qa.getTopic()).addQAPair(qa);
                     res.status(201);
                     return "";
                 },
                 gson::toJson);
     }
 
-    private static void initWebService() {
-        port(9090); // Spark will run on port 9090
-        threadPool(4);
+    public void initQAService(Set<String> newTopics, boolean overwrite) {
+        // add all exisiting
+        val availableTopics = Sets.newHashSet(QAService.getAvailableTopics());
+        availableTopics.add("default");
+        if (newTopics != null) availableTopics.addAll(newTopics);
+
+        qaServiceMap = availableTopics.stream().collect(
+                Collectors.toMap(
+                        s -> s,
+                        s -> new QAServiceBuilder()
+                                .setTopic(s)
+                                .setOverwrite(overwrite)
+                                .createQAService()));
+    }
+
+    private void initWebService(int serverPort, int numThread) {
+        port(serverPort); // Spark will run on port 9090
+        threadPool(numThread);
         enableCORS(CORS_ORIGIN, CORS_METHODS, CORS_HEADERS);
     }
 
     // Enables CORS on requests. This method is an initialization method and should be called once.
-    private static void enableCORS(final String origin, final String methods, final String headers) {
+    private void enableCORS(final String origin, final String methods, final String headers) {
 
         options("/*", (request, response) -> {
 
@@ -142,6 +156,7 @@ public class Main {
 
         after((request, response) -> {
             response.header("Content-Encoding", "gzip");
+            qaServiceMap.values().forEach(QAService::printServiceInfo);
         });
 
     }

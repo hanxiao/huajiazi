@@ -1,29 +1,20 @@
 package com.ojins.chatbot.service;
 
 import com.google.common.collect.Sets;
-import com.ojins.chatbot.dialog.QAState;
+import com.ojins.chatbot.model.QAPair;
+import com.ojins.chatbot.model.QAPairBuilder;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.util.Set;
 
+@Accessors(chain = true)
+@Setter
 public class QAServiceBuilder {
-    private Set<QAState> qaStates = Sets.newHashSet(new QAState("你的作者是谁?", "肖涵"));
+    private Set<QAPair> qaStates = Sets.newHashSet(
+            new QAPairBuilder().setQuestion("你的作者是谁啊?").setAnswer("肖涵").build());
     private String topic = "default";
     private boolean overwrite = false;
-
-    public QAServiceBuilder setOverwrite(boolean overwrite) {
-        this.overwrite = overwrite;
-        return this;
-    }
-
-    public QAServiceBuilder setQAStates(Set<QAState> qaStates) {
-        this.qaStates = qaStates;
-        return this;
-    }
-
-    public QAServiceBuilder setTopic(String topic) {
-        this.topic = topic;
-        return this;
-    }
 
     public QAService createQAService() {
         return new QAService(qaStates, topic, overwrite);

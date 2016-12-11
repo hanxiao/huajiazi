@@ -1,4 +1,7 @@
-import com.ojins.chatbot.dialog.QAState;
+package com.ojins.chatbot;
+
+import com.ojins.chatbot.model.QAPair;
+import com.ojins.chatbot.model.QAPairBuilder;
 import com.ojins.chatbot.seq2seq.EncodedQASet;
 import com.ojins.chatbot.seq2seq.QAIterator;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
@@ -22,20 +25,29 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by han on 11/23/16.
+ * ___   ___  ________  ___   __      __     __   ________ ________  ______
+ * /__/\ /__/\/_______/\/__/\ /__/\   /__/\ /__/\ /_______//_______/\/_____/\
+ * \::\ \\  \ \::: _  \ \::\_\\  \ \  \ \::\\:.\ \\__.::._\\::: _  \ \:::_ \ \
+ * \::\/_\ .\ \::(_)  \ \:. `-\  \ \  \_\::_\:_\/   \::\ \ \::(_)  \ \:\ \ \ \
+ * \:: ___::\ \:: __  \ \:. _    \ \   _\/__\_\_/\ _\::\ \_\:: __  \ \:\ \ \ \
+ * \: \ \\::\ \:.\ \  \ \. \`-\  \ \  \ \ \ \::\ /__\::\__/\:.\ \  \ \:\_\ \ \
+ * \__\/ \::\/\__\/\__\/\__\/ \__\/   \_\/  \__\\________\/\__\/\__\/\_____\/
+ * <p>
+ * <p>
+ * <p>
+ * Created on 11/23/16.
  */
-public class testSeq2Seq {
+public class TestSeq2Seq {
     @Test
     public void testToyTraining() {
-        Set<QAState> qaStates = new HashSet<>();
-        qaStates.add(new QAState(Collections.singletonList("苹果好"), Collections.singletonList("橘子不好")));
-        qaStates.add(new QAState(Collections.singletonList("橘子好"), Collections.singletonList("苹果不好")));
-        qaStates.add(new QAState(Collections.singletonList("苹果不好"), Collections.singletonList("橘子好")));
+        Set<QAPair> qaStates = new HashSet<>();
+        qaStates.add(new QAPairBuilder().setQuestion("苹果好").setAnswer("橘子不好").build());
+        qaStates.add(new QAPairBuilder().setQuestion("橘子好").setAnswer("苹果不好").build());
+        qaStates.add(new QAPairBuilder().setQuestion("苹果不好").setAnswer("橘子好").build());
 
         EncodedQASet encodedQASet = new EncodedQASet(qaStates);
 
@@ -45,8 +57,8 @@ public class testSeq2Seq {
 
         //Tweak these to tune - dataset size = batchSize * totalBatches
         final int batchSize = 10;
-        final int totalBatches = 100;
-        final int nEpochs = 50;
+        final int totalBatches = 2;
+        final int nEpochs = 2;
         final int nIterations = 1;
         final int numHiddenNodes = 128;
 
@@ -87,7 +99,7 @@ public class testSeq2Seq {
 
             MultiDataSet testData = iterator.generateTest(testSize);
             ArrayList<int[]> testNums = iterator.testFeatures();
-            INDArray[] prediction_array = net.output(new INDArray[]{testData.getFeatures(0), testData.getFeatures(1)});
+            INDArray[] prediction_array = net.output(testData.getFeatures(0), testData.getFeatures(1));
             INDArray predictions = prediction_array[0];
             INDArray answers = Nd4j.argMax(predictions, 1);
 //

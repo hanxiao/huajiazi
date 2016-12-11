@@ -1,6 +1,8 @@
 package com.ojins.chatbot.service;
 
-import com.ojins.chatbot.dialog.QAState;
+import com.ojins.chatbot.model.QAPair;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
@@ -13,14 +15,13 @@ import java.util.Set;
 /**
  * Created by han on 12/5/16.
  */
+
+@Accessors(chain = true)
+@Setter
 public class LuceneIndexerBuilder {
     private Directory index = new RAMDirectory();
-    private Set<QAState> qaStates = new HashSet<>();
-
-    public LuceneIndexerBuilder setIndex(Directory index) {
-        this.index = index;
-        return this;
-    }
+    private Set<QAPair> qaStates = new HashSet<>();
+    private boolean overwrite = false;
 
     public LuceneIndexerBuilder setFilePath(String fp) {
         try {
@@ -31,13 +32,8 @@ public class LuceneIndexerBuilder {
         return this;
     }
 
-    public LuceneIndexerBuilder setQAStates(Set<QAState> qaStates) {
-        this.qaStates = qaStates;
-        return this;
-    }
-
     public LuceneIndexer createLuceneIndexer() {
-        return new LuceneIndexer(index, qaStates);
+        return new LuceneIndexer(index, qaStates, overwrite);
     }
 
 }

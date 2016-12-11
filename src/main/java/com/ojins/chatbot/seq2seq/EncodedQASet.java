@@ -2,8 +2,8 @@ package com.ojins.chatbot.seq2seq;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.ojins.chatbot.analyzer.ChineseSynonymAnalyzer;
-import com.ojins.chatbot.dialog.QAState;
+import com.ojins.chatbot.analyzer.AnalyzerManager;
+import com.ojins.chatbot.model.QAPair;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
@@ -23,19 +23,34 @@ import java.util.NoSuchElementException;
 public class EncodedQASet {
 
     private static transient final Logger LOG = LoggerFactory.getLogger(EncodedQASet.class);
-
-    private BiMap<String, Integer> word2idx = HashBiMap.create();
-    private BiMap<Integer, String> idx2word;
-
-    private List<int[]> questions = new ArrayList<>();
-    private List<int[]> answers = new ArrayList<>();
-
-    private Analyzer analyzer = new ChineseSynonymAnalyzer(false, false);
-    private int wIdx = 1; // 0 is reserved for SPACE/END
     public final int SPACE_OR_END = 0;
-
     public int maxQuestionLen = 0;
     public int maxAnswerLen = 0;
+    private BiMap<String, Integer> word2idx = HashBiMap.create();
+    private BiMap<Integer, String> idx2word;
+    private List<int[]> questions = new ArrayList<>();
+    private List<int[]> answers = new ArrayList<>();
+    private Analyzer analyzer = AnalyzerManager.chinesePlainAnalyzer;
+    private int wIdx = 1; // 0 is reserved for SPACE/END
+
+    public EncodedQASet(Collection<QAPair> qaStates) {
+        // first build dictionary
+        qaStates.stream().forEach(p -> {
+            try {
+                int[] q_idx = EncodeSentence(p.getQuestion(), true).stream().mapToInt(i -> i).toArray();
+                maxQuestionLen = maxQuestionLen > q_idx.length ? maxQuestionLen : q_idx.length;
+                int[] a_idx = EncodeSentence(p.getAnswer(), true).stream().mapToInt(i -> i).toArray();
+                maxAnswerLen = maxAnswerLen > a_idx.length ? maxAnswerLen : a_idx.length;
+                questions.add(q_idx);
+                answers.add(a_idx);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        // build inverse map
+        idx2word = word2idx.inverse();
+    }
 
     public int size() {
         return questions.size();
@@ -64,29 +79,6 @@ public class EncodedQASet {
                 answers.size()));
     }
 
-    public EncodedQASet(Collection<QAState> qaStates) {
-        // first build dictionary
-        qaStates.stream().forEach(p -> {
-            try {
-                for (String q : p.getQuestions()) {
-                    int[] q_idx = EncodeSentence(q, true).stream().mapToInt(i -> i).toArray();
-                    maxQuestionLen = maxQuestionLen > q_idx.length ? maxQuestionLen : q_idx.length;
-                    for (String a : p.getAnswers()) {
-                        int[] a_idx = EncodeSentence(a, true).stream().mapToInt(i -> i).toArray();
-                        maxAnswerLen = maxAnswerLen > a_idx.length ? maxAnswerLen : a_idx.length;
-                        questions.add(q_idx);
-                        answers.add(a_idx);
-                    }
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        });
-
-        // build inverse map
-        idx2word = word2idx.inverse();
-    }
-
     public int[] getEncodeSentence(String s) {
         try {
             return EncodeSentence(s, false).stream().mapToInt(i -> i).toArray();
@@ -102,7 +94,7 @@ public class EncodedQASet {
             if (idx2word.containsKey(j)) {
                 sent += idx2word.get(j) + " ";
             } else {
-                LOG.error(String.format("%d is out of idx2word map!", j));
+                LOG.error("{} is out of idx2word map!", j);
             }
         }
         return sent.trim();
@@ -126,7 +118,7 @@ public class EncodedQASet {
                 if (curIdx >= 0) {
                     encodedSent.add(curIdx);
                 } else {
-                    LOG.error(String.format("String: %s contains unknown words", s));
+                    LOG.error("String: {} contains unknown words", s);
                     throw new NoSuchElementException();
                 }
             }
