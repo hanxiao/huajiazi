@@ -104,7 +104,6 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <mainClass>com.ojins.chatbot.controller.QAController</mainClass>
-                            <classpathPrefix>dependency-jars/</classpathPrefix>
                         </manifest>
                     </archive>
                 </configuration>
