@@ -1,8 +1,10 @@
 package com.ojins.chatbot.service;
 
 import com.ojins.chatbot.model.QAPair;
+import lombok.AccessLevel;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
@@ -18,10 +20,11 @@ import java.util.Set;
 
 @Accessors(chain = true)
 @Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 class LuceneIndexerBuilder {
-    private Directory index = new RAMDirectory();
-    private Set<QAPair> qaStates = new HashSet<>();
-    private boolean overwrite = false;
+    Directory index = new RAMDirectory();
+    Set<QAPair> qaStates = new HashSet<>();
+    boolean overwrite = false;
 
     LuceneIndexerBuilder setFilePath(String fp) {
         try {

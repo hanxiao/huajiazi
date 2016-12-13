@@ -1,8 +1,10 @@
 package com.ojins.chatbot.service;
 
 import com.ojins.chatbot.analyzer.AnalyzerManager;
+import lombok.AccessLevel;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -13,10 +15,11 @@ import java.nio.file.Paths;
 
 @Accessors(chain = true)
 @Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class LuceneReaderBuilder {
-    private Analyzer analyzer = AnalyzerManager.chineseIKSmartAnalyzer;
-    private Directory index = new RAMDirectory();
-    private int numAnswer = 5;
+    Analyzer analyzer = AnalyzerManager.chineseIKSmartAnalyzer;
+    Directory index = new RAMDirectory();
+    int numAnswer = 5;
 
     public LuceneReaderBuilder setFilePath(String fp) {
         try {

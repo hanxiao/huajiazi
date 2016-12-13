@@ -2,6 +2,8 @@ package com.ojins.chatbot.service;
 
 import com.ojins.chatbot.model.QAPair;
 import com.ojins.chatbot.model.QAPairBuilder;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -17,11 +19,12 @@ import java.util.stream.Collectors;
  */
 
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class QAService {
     public static String UNSOLVED_MARKER = "unsolved";
-    private LuceneIndexer luceneIndexer;
-    private LuceneReader luceneReader;
-    private String curTopic;
+    LuceneIndexer luceneIndexer;
+    LuceneReader luceneReader;
+    String curTopic;
 
     QAService(Set<QAPair> qaStates, String topic, boolean overwrite, String dir) {
         curTopic = topic;

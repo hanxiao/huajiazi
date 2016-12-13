@@ -3,7 +3,9 @@ package com.ojins.chatbot.service;
 import com.ojins.chatbot.analyzer.AnalyzerManager;
 import com.ojins.chatbot.model.QAPair;
 import com.ojins.chatbot.model.QAPairBuilder;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.DirectoryReader;
@@ -24,11 +26,12 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @AllArgsConstructor
-public class LuceneReader {
+@FieldDefaults(level = AccessLevel.PRIVATE)
+class LuceneReader {
 
-    private Analyzer chineseAnalyzer;
-    private Directory index;
-    private int numAnswer;
+    Analyzer chineseAnalyzer;
+    Directory index;
+    int numAnswer;
 
     Optional<List<QAPair>> getUnsolved() throws IOException, ParseException {
         TermQuery term1 = new TermQuery(new Term("Answer", QAService.UNSOLVED_MARKER));

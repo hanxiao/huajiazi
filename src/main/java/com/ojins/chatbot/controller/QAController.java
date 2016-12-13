@@ -6,7 +6,10 @@ import com.ojins.chatbot.model.QAPair;
 import com.ojins.chatbot.model.QAPairBuilder;
 import com.ojins.chatbot.service.QAService;
 import com.ojins.chatbot.service.QAServiceBuilder;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -32,18 +35,20 @@ import static spark.Spark.*;
 
 @Data
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class QAController {
 
-    private static final Gson gson = new Gson();
-    private static final String CORS_ORIGIN = "*";
-    private static final String CORS_METHODS = "GET, POST, OPTIONS, PUT, PATCH, DELETE";
-    private static final String CORS_HEADERS = "Origin, X-Requested-With, Content-Type, Accept, Authorization";
-    private static final QAPair fallbackUnknown = new QAPairBuilder()
+    static Gson gson = new Gson();
+    static String CORS_ORIGIN = "*";
+    static String CORS_METHODS = "GET, POST, OPTIONS, PUT, PATCH, DELETE";
+    static String CORS_HEADERS = "Origin, X-Requested-With, Content-Type, Accept, Authorization";
+    static QAPair fallbackUnknown = new QAPairBuilder()
             .setAnswer("这个问题我现在没法回答……不过我已经记下啦, 过一会儿回答你。")
             .build();
 
-    private final String indexDir;
-    private static Map<String, QAService> qaServiceMap;
+    String indexDir;
+    @NonFinal
+    static Map<String, QAService> qaServiceMap;
 
     QAController(Set<String> newTopics, boolean overwrite, int serverPort, int numThread, String dir) {
         indexDir = dir;

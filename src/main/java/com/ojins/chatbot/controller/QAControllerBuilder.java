@@ -1,7 +1,9 @@
 package com.ojins.chatbot.controller;
 
+import lombok.AccessLevel;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 
 import java.util.Set;
 
@@ -20,12 +22,13 @@ import java.util.Set;
  */
 @Accessors(chain = true)
 @Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class QAControllerBuilder {
-    private Set<String> newTopics;
-    private boolean overwrite = true;
-    private int serverPort = 9090;
-    private int numThread = 10;
-    private String indexDir = "tmp-index/";
+    Set<String> newTopics;
+    boolean overwrite = true;
+    int serverPort = 9090;
+    int numThread = 10;
+    String indexDir = "tmp-index/";
 
     public QAController build() {
         return new QAController(newTopics, overwrite, serverPort, numThread, indexDir);

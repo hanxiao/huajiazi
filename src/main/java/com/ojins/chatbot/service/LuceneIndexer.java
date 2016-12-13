@@ -2,7 +2,9 @@ package com.ojins.chatbot.service;
 
 import com.ojins.chatbot.analyzer.AnalyzerManager;
 import com.ojins.chatbot.model.QAPair;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
@@ -25,10 +27,11 @@ import java.util.Set;
 
 @Slf4j
 @Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class LuceneIndexer {
 
-    private Analyzer analyzer = AnalyzerManager.chineseIKSmartAnalyzer;
-    private Directory index;
+    Analyzer analyzer = AnalyzerManager.chineseIKSmartAnalyzer;
+    Directory index;
 
     public LuceneIndexer(Directory index, Set<QAPair> qaPairs, boolean overwrite) {
         this.index = index;
