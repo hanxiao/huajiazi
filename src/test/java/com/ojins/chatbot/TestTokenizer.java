@@ -49,7 +49,7 @@ public class TestTokenizer {
         String[] sent = {"你好啊!", "你好么?", "你！！！好啊！！！"};
 
         for (String s : sent) {
-            val strings = AnalyzerManager.getTokenizerResult(s, AnalyzerManager.chineseIKSmartAnalyzer);
+            val strings = AnalyzerManager.getTokenizerResult(s, chineseIKSmartAnalyzer);
             if (strings.isPresent()) log.info(String.join("|", strings.get()));
 
         }

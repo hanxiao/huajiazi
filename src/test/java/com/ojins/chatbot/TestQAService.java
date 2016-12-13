@@ -5,11 +5,14 @@ import com.ojins.chatbot.service.QAService;
 import com.ojins.chatbot.service.QAServiceBuilder;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.commons.io.FileUtils;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * ___   ___  ________  ___   __      __     __   ________ ________  ______
@@ -25,13 +28,16 @@ import java.util.Arrays;
 
 @Slf4j
 public class TestQAService {
-    private QAService qaService;
+    private static QAService qaService;
+    private static String indexDir = "tmp-test-idx/";
 
-    public TestQAService() throws IOException {
-        val fp = getClass().getClassLoader().getResource("test-load.json").getPath();
+    @BeforeClass
+    public static void testQAService() throws IOException {
+        val fp = TestQAService.class.getClassLoader().getResource("test-load.json").getPath();
         val qaStates = QAPair.fromJsonFile(fp);
         qaService = new QAServiceBuilder()
                 .setQaStates(qaStates)
+                .setIndexDir(indexDir)
                 .setTopic("phd")
                 .setOverwrite(true)
                 .createQAService();
@@ -40,6 +46,7 @@ public class TestQAService {
 
         qaService = new QAServiceBuilder()
                 .setQaStates(qaStates)
+                .setIndexDir(indexDir)
                 .setTopic("quant")
                 .setOverwrite(true)
                 .createQAService();
@@ -49,8 +56,9 @@ public class TestQAService {
 
     @Test
     public void testSwitchTopic() {
+        qaService = QAService.selectTopic("quant", indexDir).orElse(null);
         Assert.assertEquals(qaService.getAnswer("这是什么主题数据库?").get().getAnswer(), "量化交易");
-        qaService = QAService.selectTopic("phd").orElse(null);
+        qaService = QAService.selectTopic("phd", indexDir).orElse(null);
         if (qaService != null) {
             Assert.assertEquals("博士申请", qaService.getAnswer("这是什么主题数据库?").get().getAnswer());
         }
@@ -58,7 +66,7 @@ public class TestQAService {
 
     @Test
     public void testMultipleQuestions() {
-        qaService = QAService.selectTopic("phd").orElse(null);
+        qaService = QAService.selectTopic("phd", indexDir).orElse(null);
         val answers = qaService.getAnswer(new String[]{"这是什么数据库?", "你的作者?"});
         Assert.assertEquals(2, answers.size());
         log.info(answers.toString());
@@ -67,6 +75,7 @@ public class TestQAService {
     @Test
     public void testAddDuplicateTurnOff() throws IOException {
         qaService = new QAServiceBuilder()
+                .setIndexDir(indexDir)
                 .setTopic("default")
                 .setOverwrite(true)
                 .createQAService();
@@ -82,6 +91,7 @@ public class TestQAService {
     @Test
     public void testAddDuplicateTurnOn() throws IOException {
         qaService = new QAServiceBuilder()
+                .setIndexDir(indexDir)
                 .setTopic("default")
                 .setOverwrite(true)
                 .createQAService();
@@ -94,7 +104,15 @@ public class TestQAService {
 
     @Test
     public void testListingTopics() {
-        log.info(Arrays.toString(QAService.getAvailableTopics()));
-        Assert.assertTrue(QAService.getAvailableTopics().length > 0);
+        val topics = QAService.getAvailableTopics(indexDir);
+        Assert.assertTrue(topics.isPresent());
+        val topics2 = QAService.getAvailableTopics("123456");
+        Assert.assertFalse(topics2.isPresent());
+    }
+
+    @AfterClass
+    public static void deleteTmpFolder() throws IOException {
+        FileUtils.deleteDirectory(new File(indexDir));
+        log.info("clear the test directory");
     }
 }

@@ -27,13 +27,13 @@ public class LuceneReaderBuilder {
         return this;
     }
 
-    public LuceneReaderBuilder setIndexer(LuceneIndexer indexer) {
+    LuceneReaderBuilder setIndexer(LuceneIndexer indexer) {
         this.index = indexer.getIndex();
         this.analyzer = indexer.getAnalyzer();
         return this;
     }
 
-    public LuceneReader createLuceneReader() {
+    LuceneReader createLuceneReader() {
         return new LuceneReader(analyzer, index, numAnswer);
     }
 }

@@ -63,7 +63,7 @@ public class LuceneReader {
 
     }
 
-    public Optional<QAPair> getAnswers(String question) throws IOException, ParseException {
+    Optional<QAPair> getAnswers(String question) throws IOException, ParseException {
         AnalyzerManager.getTokenizerResult(question, chineseAnalyzer);
 
         Query q = new QueryParser("Question", chineseAnalyzer)

@@ -11,10 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static spark.Spark.*;
@@ -45,10 +42,12 @@ public class QAController {
             .setAnswer("这个问题我现在没法回答……不过我已经记下啦, 过一会儿回答你。")
             .build();
 
+    private final String indexDir;
     private static Map<String, QAService> qaServiceMap;
 
-    public QAController(Set<String> newTopics, boolean overwrite, int serverPort, int numThread) {
-        initQAService(newTopics, overwrite);
+    QAController(Set<String> newTopics, boolean overwrite, int serverPort, int numThread, String dir) {
+        indexDir = dir;
+        initQAService(dir, newTopics, overwrite);
         initWebService(serverPort, numThread);
         initRouter();
     }
@@ -59,7 +58,7 @@ public class QAController {
 
     private void initRouter() {
         get("/topic",
-                (req, res) -> QAService.getAvailableTopics(), gson::toJson);
+                (req, res) -> QAService.getAvailableTopics(indexDir), gson::toJson);
 
         get("/:topic/size",
                 (req, res) -> QAService.selectTopic(qaServiceMap, req.params(":topic")).getNumDocs(),
@@ -107,16 +106,18 @@ public class QAController {
                 gson::toJson);
     }
 
-    public void initQAService(Set<String> newTopics, boolean overwrite) {
+    private void initQAService(String indexDir, Set<String> newTopics, boolean overwrite) {
         // add all exisiting
-        val availableTopics = Sets.newHashSet(QAService.getAvailableTopics());
+        val existTopics = QAService.getAvailableTopics(indexDir);
+        val availableTopics = new HashSet<String>(newTopics);
+        existTopics.ifPresent(strings -> availableTopics.addAll(Sets.newHashSet(strings)));
         availableTopics.add("default");
-        if (newTopics != null) availableTopics.addAll(newTopics);
 
         qaServiceMap = availableTopics.stream().collect(
                 Collectors.toMap(
                         s -> s,
                         s -> new QAServiceBuilder()
+                                .setIndexDir(indexDir)
                                 .setTopic(s)
                                 .setOverwrite(overwrite)
                                 .createQAService()));

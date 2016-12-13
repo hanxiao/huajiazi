@@ -23,9 +23,11 @@ public class QAService {
     private LuceneReader luceneReader;
     private String curTopic;
 
-    public QAService(Set<QAPair> qaStates, String topic, boolean overwrite) {
+    QAService(Set<QAPair> qaStates, String topic, boolean overwrite, String dir) {
         curTopic = topic;
-        val fp = Paths.get("index", topic);
+        String indexDir = dir.endsWith("/") ? dir : dir + "/";
+
+        val fp = Paths.get(indexDir, topic);
         val luceneIndexerBuilder = new LuceneIndexerBuilder()
                 .setFilePath(fp.toString())
                 .setOverwrite(overwrite);
@@ -49,19 +51,29 @@ public class QAService {
         printServiceInfo();
     }
 
-    public static String[] getAvailableTopics() {
-        new File("index/").mkdirs();
-        File file = new File("index/");
-        return file.list((current, name) -> new File(current, name).isDirectory());
+    public static Optional<String[]> getAvailableTopics(String indexDir) {
+        indexDir += indexDir.endsWith("/") ? "" : "/";
+        File file = new File(indexDir);
+
+        if (file.exists()) {
+            return Optional.ofNullable(file.list((current, name) -> new File(current, name).isDirectory()));
+        } else {
+            return Optional.empty();
+        }
     }
 
     public static QAService selectTopic(Map<String, QAService> qaServiceMap, String topic) {
         return qaServiceMap.getOrDefault(topic, qaServiceMap.get("default"));
     }
 
-    public static Optional<QAService> selectTopic(String topic) {
-        if (new HashSet<>(Arrays.asList(getAvailableTopics())).contains(topic)) {
-            return Optional.of(new QAServiceBuilder().setTopic(topic).createQAService());
+    public static Optional<QAService> selectTopic(String topic, String indexDir) {
+        val topics = getAvailableTopics(indexDir);
+
+        if (topics.isPresent() && new HashSet<>(Arrays.asList(topics.get())).contains(topic)) {
+            return Optional.of(new QAServiceBuilder()
+                    .setIndexDir(indexDir)
+                    .setTopic(topic)
+                    .createQAService());
         } else {
             log.warn("Do not support topic {}", topic);
             return Optional.empty();

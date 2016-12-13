@@ -25,8 +25,9 @@ public class QAControllerBuilder {
     private boolean overwrite = true;
     private int serverPort = 9090;
     private int numThread = 10;
+    private String indexDir = "tmp-index/";
 
     public QAController build() {
-        return new QAController(newTopics, overwrite, serverPort, numThread);
+        return new QAController(newTopics, overwrite, serverPort, numThread, indexDir);
     }
 }

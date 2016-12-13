@@ -15,8 +15,9 @@ public class QAServiceBuilder {
             new QAPairBuilder().setQuestion("你的作者是谁啊?").setAnswer("肖涵").build());
     private String topic = "default";
     private boolean overwrite = false;
+    private String indexDir = "tmp-index/";
 
     public QAService createQAService() {
-        return new QAService(qaStates, topic, overwrite);
+        return new QAService(qaStates, topic, overwrite, indexDir);
     }
 }

@@ -18,12 +18,12 @@ import java.util.Set;
 
 @Accessors(chain = true)
 @Setter
-public class LuceneIndexerBuilder {
+class LuceneIndexerBuilder {
     private Directory index = new RAMDirectory();
     private Set<QAPair> qaStates = new HashSet<>();
     private boolean overwrite = false;
 
-    public LuceneIndexerBuilder setFilePath(String fp) {
+    LuceneIndexerBuilder setFilePath(String fp) {
         try {
             this.index = FSDirectory.open(Paths.get(fp));
         } catch (IOException ex) {
@@ -32,7 +32,7 @@ public class LuceneIndexerBuilder {
         return this;
     }
 
-    public LuceneIndexer createLuceneIndexer() {
+    LuceneIndexer createLuceneIndexer() {
         return new LuceneIndexer(index, qaStates, overwrite);
     }
 

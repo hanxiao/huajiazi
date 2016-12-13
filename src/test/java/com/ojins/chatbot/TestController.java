@@ -28,6 +28,8 @@ import static org.junit.Assert.assertNotNull;
  * Created on 2016/12/11.
  */
 public class TestController {
+    private static String indexDir = "tmp-test-idx/";
+
     @ClassRule
     public static SparkServer<TestWebServer> testServer = new SparkServer<>(TestWebServer.class, 9090);
 
@@ -132,7 +134,10 @@ public class TestController {
     public static class TestWebServer implements SparkApplication {
         @Override
         public void init() {
-            new QAControllerBuilder().setNewTopics(Sets.newHashSet("test0", "test1", "test2", "test3")).build();
+            new QAControllerBuilder()
+                    .setNewTopics(Sets.newHashSet("test0", "test1", "test2", "test3"))
+                    .setIndexDir(indexDir)
+                    .build();
         }
     }
 }
