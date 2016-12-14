@@ -1,5 +1,6 @@
 package com.ojins.chatbot.seq2seq;
 
+import lombok.Data;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.MultiDataSet;
 import org.nd4j.linalg.dataset.api.MultiDataSetPreProcessor;
@@ -17,22 +18,23 @@ import java.util.stream.IntStream;
  * This class can also be used as a reference for dataset iterators and writing one's own custom dataset iterator
  */
 
+@Data
 public class QAIterator implements MultiDataSetIterator {
 
-    private Random randnumG;
-    private int currentBatch;
-    private int[] questionArr;
-    private int[] answerArr;
-    private boolean toTestSet;
-    private final int seed;
-    private final int batchSize;
-    private final int totalBatches;
-    private final int encoderSeqLength;
-    private final int decoderSeqLength;
-    private final int outputSeqLength;
-    private final EncodedQASet encodedQASet;
+    Random randnumG;
+    int currentBatch;
+    int[] questionArr;
+    int[] answerArr;
+    boolean toTestSet;
+    final int seed;
+    final int batchSize;
+    final int totalBatches;
+    final int encoderSeqLength;
+    final int decoderSeqLength;
+    final int outputSeqLength;
+    final EncodedQASet encodedQASet;
 
-    private final int SEQ_VECTOR_DIM;
+    final int SEQ_VECTOR_DIM;
 
     public QAIterator(int seed, int batchSize, int totalBatches, EncodedQASet encodedQASet) {
 
@@ -54,8 +56,7 @@ public class QAIterator implements MultiDataSetIterator {
 
     public MultiDataSet generateTest(int testSize) {
         toTestSet = true;
-        MultiDataSet testData = next(testSize);
-        return testData;
+        return next(testSize);
     }
 
     public ArrayList<int[]> testFeatures() {

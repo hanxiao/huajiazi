@@ -33,16 +33,14 @@ public class LuceneIndexer {
     Analyzer analyzer = AnalyzerManager.chineseIKSmartAnalyzer;
     Directory index;
 
-    public LuceneIndexer(Directory index, Set<QAPair> qaPairs, boolean overwrite) {
+    LuceneIndexer(Directory index, Set<QAPair> qaPairs, boolean overwrite) {
         this.index = index;
         try (IndexWriter w = new IndexWriter(index, new IndexWriterConfig(analyzer))) {
             if (overwrite) {
                 w.deleteAll();
                 w.commit();
             }
-            qaPairs.forEach(p -> {
-                indexQAState(w, p, overwrite);
-            });
+            qaPairs.forEach(p -> indexQAState(w, p, overwrite));
             w.forceMergeDeletes();
             w.flush();
             w.commit();
@@ -77,7 +75,7 @@ public class LuceneIndexer {
         return addQAPair(qaPair, false);
     }
 
-    public boolean addQAPair(QAPair qaState, boolean overwrite) {
+    boolean addQAPair(QAPair qaState, boolean overwrite) {
         try (IndexWriter w = new IndexWriter(index, new IndexWriterConfig(analyzer))) {
             indexQAState(w, qaState, overwrite);
             w.commit();

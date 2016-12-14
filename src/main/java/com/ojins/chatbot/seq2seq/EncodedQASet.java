@@ -4,6 +4,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.ojins.chatbot.analyzer.AnalyzerManager;
 import com.ojins.chatbot.model.QAPair;
+import lombok.Data;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
@@ -20,22 +21,24 @@ import java.util.NoSuchElementException;
 /**
  * Created by han on 11/22/16.
  */
+
+@Data
 public class EncodedQASet {
 
-    private static transient final Logger LOG = LoggerFactory.getLogger(EncodedQASet.class);
-    public final int SPACE_OR_END = 0;
-    public int maxQuestionLen = 0;
-    public int maxAnswerLen = 0;
-    private BiMap<String, Integer> word2idx = HashBiMap.create();
-    private BiMap<Integer, String> idx2word;
-    private List<int[]> questions = new ArrayList<>();
-    private List<int[]> answers = new ArrayList<>();
-    private Analyzer analyzer = AnalyzerManager.chinesePlainAnalyzer;
-    private int wIdx = 1; // 0 is reserved for SPACE/END
+    static transient final Logger LOG = LoggerFactory.getLogger(EncodedQASet.class);
+    final int SPACE_OR_END = 0;
+    int maxQuestionLen = 0;
+    int maxAnswerLen = 0;
+    BiMap<String, Integer> word2idx = HashBiMap.create();
+    BiMap<Integer, String> idx2word;
+    List<int[]> questions = new ArrayList<>();
+    List<int[]> answers = new ArrayList<>();
+    Analyzer analyzer = AnalyzerManager.chinesePlainAnalyzer;
+    int wIdx = 1; // 0 is reserved for SPACE/END
 
     public EncodedQASet(Collection<QAPair> qaStates) {
         // first build dictionary
-        qaStates.stream().forEach(p -> {
+        qaStates.forEach(p -> {
             try {
                 int[] q_idx = EncodeSentence(p.getQuestion(), true).stream().mapToInt(i -> i).toArray();
                 maxQuestionLen = maxQuestionLen > q_idx.length ? maxQuestionLen : q_idx.length;
