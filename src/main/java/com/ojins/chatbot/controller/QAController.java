@@ -69,6 +69,10 @@ public class QAController {
                 (req, res) -> QAService.selectTopic(qaServiceMap, req.params(":topic")).getNumDocs(),
                 gson::toJson);
 
+        get("/:topic",
+                (req, res) -> QAService.selectTopic(qaServiceMap, req.params(":topic")).getAll(),
+                gson::toJson);
+
         get("/:topic/unsolved",
                 (req, res) -> {
                     Optional<List<QAPair>> unsolved = QAService.selectTopic(qaServiceMap, req.params(":topic"))

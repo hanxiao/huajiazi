@@ -33,15 +33,11 @@ class LuceneReader {
     Directory index;
     int numAnswer;
 
-    Optional<List<QAPair>> getUnsolved() throws IOException, ParseException {
-        TermQuery term1 = new TermQuery(new Term("Answer", QAService.UNSOLVED_MARKER));
-        Query q = new BooleanQuery.Builder()
-                .add(term1, BooleanClause.Occur.MUST)
-                .build();
-
+    private Optional<List<QAPair>> getQAbyQuery(Query q) throws IOException, ParseException {
         IndexReader reader = DirectoryReader.open(index);
         IndexSearcher searcher = new IndexSearcher(reader);
-        TopDocs docs = searcher.search(q, 10000);
+        final int maxNumAnswer = 10000;
+        TopDocs docs = searcher.search(q, maxNumAnswer);
         ScoreDoc[] hits = docs.scoreDocs;
         Map<String, QAPair> answers = new HashMap<>();
         for (ScoreDoc h : hits) {
@@ -63,6 +59,18 @@ class LuceneReader {
         }
 
         return Optional.of(answers.values().stream().collect(Collectors.toList()));
+    }
+
+    Optional<List<QAPair>> getAll() throws IOException, ParseException {
+        return getQAbyQuery(new MatchAllDocsQuery());
+    }
+
+    Optional<List<QAPair>> getUnsolved() throws IOException, ParseException {
+        TermQuery term1 = new TermQuery(new Term("Answer", QAService.UNSOLVED_MARKER));
+
+        return getQAbyQuery(new BooleanQuery.Builder()
+                .add(term1, BooleanClause.Occur.MUST)
+                .build());
 
     }
 
