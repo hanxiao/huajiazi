@@ -42,7 +42,7 @@ public class TestQAService {
                 .setOverwrite(true)
                 .createQAService();
 
-        qaService.addQAPair("这是什么主题的数据库?", "博士申请");
+        qaService.addQAPair("这是什么主题的数据库?", "博士申请", true);
 
         qaService = new QAServiceBuilder()
                 .setQaStates(qaStates)
@@ -51,7 +51,7 @@ public class TestQAService {
                 .setOverwrite(true)
                 .createQAService();
 
-        qaService.addQAPair("这是什么主题的数据库?", "量化交易");
+        qaService.addQAPair("这是什么主题的数据库?", "量化交易", true);
     }
 
     @Test

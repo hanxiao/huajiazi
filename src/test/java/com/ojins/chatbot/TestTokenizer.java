@@ -38,7 +38,7 @@ public class TestTokenizer {
         for (String s : sent) {
             for (Analyzer a : analyzer) {
                 val strings = AnalyzerManager.getTokenizerResult(s, a);
-                if (strings.isPresent()) log.info("{}", String.join("|", strings.get()));
+                strings.ifPresent(strings1 -> log.info("{}", String.join("|", strings1)));
             }
         }
     }
@@ -50,7 +50,7 @@ public class TestTokenizer {
 
         for (String s : sent) {
             val strings = AnalyzerManager.getTokenizerResult(s, chineseIKSmartAnalyzer);
-            if (strings.isPresent()) log.info(String.join("|", strings.get()));
+            strings.ifPresent(strings1 -> log.info(String.join("|", strings1)));
 
         }
     }

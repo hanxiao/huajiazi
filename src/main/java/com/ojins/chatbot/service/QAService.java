@@ -123,10 +123,6 @@ public class QAService {
         return Arrays.stream(question).map(this::getAnswer).collect(Collectors.toList());
     }
 
-    public boolean addQAPair(String question, String answer) {
-        return addQAPair(question, answer, true);
-    }
-
     public boolean addQAPair(QAPair qaPair, boolean overwrite) {
         return luceneIndexer.addQAPair(qaPair, overwrite);
     }
