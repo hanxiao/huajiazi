@@ -3,6 +3,7 @@ package com.ojins.chatbot;
 import com.despegar.sparkjava.test.SparkClient;
 import com.despegar.sparkjava.test.SparkServer;
 import com.google.common.collect.Sets;
+import com.google.gson.reflect.TypeToken;
 import com.ojins.chatbot.controller.QAControllerBuilder;
 import com.ojins.chatbot.model.QAPair;
 import com.ojins.chatbot.model.QAPairBuilder;
@@ -10,6 +11,9 @@ import lombok.val;
 import org.junit.ClassRule;
 import org.junit.Test;
 import spark.servlet.SparkApplication;
+
+import java.lang.reflect.Type;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -54,6 +58,18 @@ public class TestController {
         SparkClient.UrlResponse response = testServer.getClient().doMethod("GET", "/test1/你的作者是?", null, "application/json");
         assertNotNull(testServer.getApplication());
         assertEquals(200, response.status);
+    }
+
+    @Test
+    public void testGeAllQuestion() throws Exception {
+        SparkClient.UrlResponse response = testServer.getClient().doMethod("GET", "/test0", null,
+                "application/json");
+        assertNotNull(testServer.getApplication());
+        assertEquals(200, response.status);
+        Type setType = new TypeToken<Set<QAPair>>() {
+        }.getType();
+        val result = QAPair.fromJsonArray(response.body);
+        assertEquals(1, result.size());
     }
 
     @Test

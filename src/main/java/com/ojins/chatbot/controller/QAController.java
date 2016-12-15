@@ -62,6 +62,7 @@ public class QAController {
     }
 
     private void initRouter() {
+
         get("/topic",
                 (req, res) -> QAService.getAvailableTopics(indexDir), gson::toJson);
 
@@ -70,7 +71,14 @@ public class QAController {
                 gson::toJson);
 
         get("/:topic",
-                (req, res) -> QAService.selectTopic(qaServiceMap, req.params(":topic")).getAll(),
+                (req, res) -> {
+                    Optional<List<QAPair>> allQA = QAService.selectTopic(qaServiceMap, req.params(":topic")).getAll();
+                    if (allQA.isPresent()) {
+                        return allQA.get();
+                    }
+                    res.status(204);
+                    return "";
+                },
                 gson::toJson);
 
         get("/:topic/unsolved",
@@ -118,7 +126,7 @@ public class QAController {
     private void initQAService(String indexDir, Set<String> newTopics, boolean overwrite) {
         // add all exisiting
         val existTopics = QAService.getAvailableTopics(indexDir);
-        val availableTopics = new HashSet<String>(newTopics);
+        val availableTopics = newTopics == null ? new HashSet<String>() : new HashSet<String>(newTopics);
         existTopics.ifPresent(strings -> availableTopics.addAll(Sets.newHashSet(strings)));
         availableTopics.add("default");
 

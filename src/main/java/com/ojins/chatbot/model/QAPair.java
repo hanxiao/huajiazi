@@ -50,6 +50,12 @@ public class QAPair {
         return gson.fromJson(json, setType);
     }
 
+    public static Set<QAPair> fromJsonArray(String json) {
+        Type setType = new TypeToken<Set<QAPair>>() {
+        }.getType();
+        return gson.fromJson(json, setType);
+    }
+
     public static void toJsonFile(Set<QAPair> states, String fp) {
         try (PrintWriter writer = new PrintWriter(new FileOutputStream(new File(fp), false))) {
             writer.println(gson.toJson(states));
