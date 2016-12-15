@@ -72,9 +72,22 @@ public class QAController {
 
         get("/:topic",
                 (req, res) -> {
-                    Optional<List<QAPair>> allQA = QAService.selectTopic(qaServiceMap, req.params(":topic")).getAll();
+                    Optional<List<QAPair>> allQA = QAService.selectTopic(qaServiceMap, req.params(":topic"))
+                            .getFiltered(QAService.FilterCondition.ALL);
                     if (allQA.isPresent()) {
                         return allQA.get();
+                    }
+                    res.status(204);
+                    return "";
+                },
+                gson::toJson);
+
+        get("/:topic/solved",
+                (req, res) -> {
+                    Optional<List<QAPair>> solved = QAService.selectTopic(qaServiceMap, req.params(":topic"))
+                            .getFiltered(QAService.FilterCondition.SOLVED);
+                    if (solved.isPresent()) {
+                        return solved.get();
                     }
                     res.status(204);
                     return "";
@@ -84,7 +97,7 @@ public class QAController {
         get("/:topic/unsolved",
                 (req, res) -> {
                     Optional<List<QAPair>> unsolved = QAService.selectTopic(qaServiceMap, req.params(":topic"))
-                            .getUnsolved();
+                            .getFiltered(QAService.FilterCondition.UNSOLVED);
                     if (unsolved.isPresent()) {
                         return unsolved.get();
                     }

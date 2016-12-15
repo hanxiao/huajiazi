@@ -65,13 +65,20 @@ class LuceneReader {
         return getQAbyQuery(new MatchAllDocsQuery());
     }
 
+    Optional<List<QAPair>> getSolved() throws IOException, ParseException {
+        TermQuery term1 = new TermQuery(new Term("Answer", QAService.UNSOLVED_MARKER));
+
+        return getQAbyQuery(new BooleanQuery.Builder()
+                .add(term1, BooleanClause.Occur.MUST_NOT)
+                .build());
+    }
+
     Optional<List<QAPair>> getUnsolved() throws IOException, ParseException {
         TermQuery term1 = new TermQuery(new Term("Answer", QAService.UNSOLVED_MARKER));
 
         return getQAbyQuery(new BooleanQuery.Builder()
                 .add(term1, BooleanClause.Occur.MUST)
                 .build());
-
     }
 
     Optional<QAPair> getAnswers(String question) throws IOException, ParseException {

@@ -15,8 +15,7 @@ import spark.servlet.SparkApplication;
 import java.lang.reflect.Type;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * ___   ___  ________  ___   __      __     __   ________ ________  ______
@@ -105,6 +104,25 @@ public class TestController {
         val received = QAPair.fromJson(response.body);
         assertEquals(qaPair.getAnswer(), received.getAnswer());
         assertEquals(qaPair.getQuestion(), received.getQuestion());
+    }
+
+    @Test
+    public void testSumOverCheck() throws Exception {
+        val topic = "test2";
+        SparkClient.UrlResponse response = testServer.getClient().doMethod("GET", "/" + topic + "/unsolved",
+                null, "application/json");
+        assertNotNull(testServer.getApplication());
+        int unsolved = response.status == 200 ? QAPair.fromJsonArray(response.body).size() : 0;
+
+        response = testServer.getClient().doMethod("GET", "/" + topic + "/solved",
+                null, "application/json");
+        int solved = response.status == 200 ? QAPair.fromJsonArray(response.body).size() : 0;
+
+        response = testServer.getClient().doMethod("GET", "/" + topic + "/",
+                null, "application/json");
+        int all = response.status == 200 ? QAPair.fromJsonArray(response.body).size() : 0;
+
+        assertTrue(all == solved + unsolved);
     }
 
     @Test

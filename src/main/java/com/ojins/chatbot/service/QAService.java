@@ -21,6 +21,10 @@ import java.util.stream.Collectors;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class QAService {
+    public enum FilterCondition {
+        ALL, UNSOLVED, SOLVED
+    }
+
     public static String UNSOLVED_MARKER = "unsolved";
     LuceneIndexer luceneIndexer;
     LuceneReader luceneReader;
@@ -101,22 +105,20 @@ public class QAService {
         }
     }
 
-    public Optional<List<QAPair>> getUnsolved() {
+    public Optional<List<QAPair>> getFiltered(FilterCondition cond) {
         try {
-            return luceneReader.getUnsolved();
+            switch (cond) {
+                case UNSOLVED:
+                    return luceneReader.getUnsolved();
+                case SOLVED:
+                    return luceneReader.getSolved();
+                case ALL:
+                    return luceneReader.getAll();
+            }
         } catch (Exception ex) {
-            ex.printStackTrace();
-            return Optional.empty();
+            log.error("something error when getting filtered results", ex);
         }
-    }
-
-    public Optional<List<QAPair>> getAll() {
-        try {
-            return luceneReader.getAll();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return Optional.empty();
-        }
+        return Optional.empty();
     }
 
     public List<Optional<QAPair>> getAnswer(String[] question) {
