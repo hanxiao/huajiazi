@@ -116,7 +116,7 @@ public class QAController {
                         res.status(400);
                         return "";
                     }
-                    QAService.selectTopic(qaServiceMap, qa.getTopic()).addQAPair(qa);
+                    QAService.selectTopic(qaServiceMap, qa.getTopic()).addQAPair(qa, true);
                     res.status(201);
                     return "";
                 },

@@ -131,10 +131,6 @@ public class QAService {
         return luceneIndexer.addQAPair(qaPair, overwrite);
     }
 
-    public boolean addQAPair(QAPair qaPair) {
-        return luceneIndexer.addQAPair(qaPair, true);
-    }
-
     public boolean addQAPair(String question, String answer, boolean overwrite) {
         return luceneIndexer.addQAPair(
                 new QAPairBuilder()

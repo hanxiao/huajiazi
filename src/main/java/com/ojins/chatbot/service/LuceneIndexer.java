@@ -71,10 +71,6 @@ public class LuceneIndexer {
         }
     }
 
-    public boolean addQAPair(QAPair qaPair) {
-        return addQAPair(qaPair, false);
-    }
-
     boolean addQAPair(QAPair qaState, boolean overwrite) {
         try (IndexWriter w = new IndexWriter(index, new IndexWriterConfig(analyzer))) {
             indexQAState(w, qaState, overwrite);
