@@ -15,6 +15,8 @@ import spark.servlet.SparkApplication;
 import java.lang.reflect.Type;
 import java.util.Set;
 
+import static com.ojins.chatbot.controller.RouteMap.ALL_TOPICS;
+import static com.ojins.chatbot.controller.RouteMap.TEACH;
 import static org.junit.Assert.*;
 
 /**
@@ -37,7 +39,8 @@ public class TestController {
 
     @Test
     public void testGetTopic() throws Exception {
-        SparkClient.UrlResponse response = testServer.getClient().doMethod("GET", "/topic", null);
+        SparkClient.UrlResponse response = testServer.getClient()
+                .doMethod("GET", ALL_TOPICS, null);
         assertNotNull(testServer.getApplication());
         assertEquals(200, response.status);
         //assertTrue(response.body.contains("\"test0\",\"test1\",\"test2\",\"test3\""));
@@ -45,7 +48,8 @@ public class TestController {
 
     @Test
     public void testGetTopicSize() throws Exception {
-        SparkClient.UrlResponse response = testServer.getClient().doMethod("GET", "/topic/test0/size", null, "application/json");
+        SparkClient.UrlResponse response = testServer.getClient()
+                .doMethod("GET", "/test0/size", null, "application/json");
         assertNotNull(testServer.getApplication());
         assertEquals(200, response.status);
         assertEquals("1", response.body);
@@ -53,14 +57,16 @@ public class TestController {
 
     @Test
     public void testGetKnownQuestion() throws Exception {
-        SparkClient.UrlResponse response = testServer.getClient().doMethod("GET", "/topic/test1/你的作者是?", null, "application/json");
+        SparkClient.UrlResponse response = testServer.getClient()
+                .doMethod("GET", "/test1?query=你的作者是?", null, "application/json");
         assertNotNull(testServer.getApplication());
         assertEquals(200, response.status);
     }
 
     @Test
     public void testGeAllQuestion() throws Exception {
-        SparkClient.UrlResponse response = testServer.getClient().doMethod("GET", "/topic/test0", null,
+        SparkClient.UrlResponse response = testServer.getClient()
+                .doMethod("GET", "/test0/list?filter=all", null,
                 "application/json");
         assertNotNull(testServer.getApplication());
         assertEquals(200, response.status);
@@ -72,11 +78,13 @@ public class TestController {
 
     @Test
     public void testGetUnknownQuestion() throws Exception {
-        SparkClient.UrlResponse response = testServer.getClient().doMethod("GET", "/topic/test1/天上有多少颗星星?", null, "application/json");
+        SparkClient.UrlResponse response = testServer.getClient()
+                .doMethod("GET", "/test1?query=天上有多少颗星星?", null, "application/json");
         assertNotNull(testServer.getApplication());
         assertEquals(202, response.status);
 
-        response = testServer.getClient().doMethod("GET", "/topic/test1/size", null, "application/json");
+        response = testServer.getClient()
+                .doMethod("GET", "/test1/size", null, "application/json");
         assertNotNull(testServer.getApplication());
         assertEquals(200, response.status);
         assertEquals("2", response.body);
@@ -91,12 +99,13 @@ public class TestController {
                 .setTopic(topic)
                 .build();
 
-        SparkClient.UrlResponse response = testServer.getClient().doMethod("POST", "/teach",
+        SparkClient.UrlResponse response = testServer.getClient().doMethod("POST", TEACH,
                 qaPair.toJson(), "application/json");
         assertNotNull(testServer.getApplication());
         assertEquals(201, response.status);
 
-        response = testServer.getClient().doMethod("GET", "/topic/" + topic + "/new%20question",
+        response = testServer.getClient()
+                .doMethod("GET", "/" + topic + "?query=new%20question",
                 null, "application/json");
         assertNotNull(testServer.getApplication());
         assertEquals(200, response.status);
@@ -108,16 +117,19 @@ public class TestController {
     @Test
     public void testSumOverCheck() throws Exception {
         val topic = "test2";
-        SparkClient.UrlResponse response = testServer.getClient().doMethod("GET", "/topic/" + topic + "/unsolved",
+        SparkClient.UrlResponse response = testServer.getClient()
+                .doMethod("GET", "/" + topic + "?filter=unsolved",
                 null, "application/json");
         assertNotNull(testServer.getApplication());
         int unsolved = response.status == 200 ? QAPair.fromJsonArray(response.body).size() : 0;
 
-        response = testServer.getClient().doMethod("GET", "/topic/" + topic + "/solved",
+        response = testServer.getClient()
+                .doMethod("GET", "/" + topic + "?filter=solved",
                 null, "application/json");
         int solved = response.status == 200 ? QAPair.fromJsonArray(response.body).size() : 0;
 
-        response = testServer.getClient().doMethod("GET", "/topic/" + topic + "/",
+        response = testServer.getClient()
+                .doMethod("GET", "/" + topic + "?filter=all",
                 null, "application/json");
         int all = response.status == 200 ? QAPair.fromJsonArray(response.body).size() : 0;
 
@@ -128,19 +140,22 @@ public class TestController {
     public void testUnsolved() throws Exception {
         // by default there is no unsolved question
         val topic = "test2";
-        SparkClient.UrlResponse response = testServer.getClient().doMethod("GET", "/topic/" + topic + "/unsolved",
+        SparkClient.UrlResponse response = testServer.getClient()
+                .doMethod("GET", "/" + topic + "/list?filter=unsolved",
                 null, "application/json");
         assertNotNull(testServer.getApplication());
         assertEquals(204, response.status);
 
         // ask a new question
-        response = testServer.getClient().doMethod("GET", "/topic/" + topic + "/new%20question",
+        response = testServer.getClient()
+                .doMethod("GET", "/" + topic + "?query=new%20question",
                 null, "application/json");
         assertNotNull(testServer.getApplication());
         assertEquals(202, response.status);
 
         // now we should be able to get one unsolved question
-        response = testServer.getClient().doMethod("GET", "/topic/" + topic + "/unsolved",
+        response = testServer.getClient()
+                .doMethod("GET", "/" + topic + "/list?filter=unsolved",
                 null, "application/json");
         assertNotNull(testServer.getApplication());
         assertEquals(200, response.status);
@@ -151,13 +166,14 @@ public class TestController {
                 .setTopic(topic)
                 .build();
 
-        response = testServer.getClient().doMethod("POST", "/teach",
+        response = testServer.getClient().doMethod("POST", TEACH,
                 qaPair.toJson(), "application/json");
         assertNotNull(testServer.getApplication());
         assertEquals(201, response.status);
 
         // after teach, there is no unsolved question
-        response = testServer.getClient().doMethod("GET", "/topic/" + topic + "/unsolved",
+        response = testServer.getClient()
+                .doMethod("GET", "/" + topic + "/list?filter=unsolved",
                 null, "application/json");
         assertNotNull(testServer.getApplication());
         assertEquals(204, response.status);

@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.ojins.chatbot.controller.RouteMap.*;
 import static spark.Spark.*;
 
 /**
@@ -58,70 +59,76 @@ public class QAController {
     }
 
     public static void main(final String[] args) throws IOException {
-        new QAControllerBuilder().build();
+        new QAControllerBuilder().setNewTopics(Sets.newHashSet("phd", "quant")).build();
     }
 
     private void initRouter() {
 
-        get("/topic",
-                (req, res) -> QAService.getAvailableTopics(indexDir), gson::toJson);
-
-        get("/topic/:topic/size",
-                (req, res) -> QAService.selectTopic(qaServiceMap, req.params(":topic")).getNumDocs(),
-                gson::toJson);
-
-        get("/topic/:topic",
+        get(ALL_TOPICS,
                 (req, res) -> {
-                    Optional<List<QAPair>> allQA = QAService.selectTopic(qaServiceMap, req.params(":topic"))
-                            .getFiltered(QAService.FilterCondition.ALL);
-                    if (allQA.isPresent()) {
-                        return allQA.get();
+                    Optional<String[]> result = QAService.getAvailableTopics(indexDir);
+                    if (result.isPresent()) {
+                        return result.get();
                     }
                     res.status(204);
+                    return "";
+                }, gson::toJson);
+        get(TOPIC_SIZE,
+                (req, res) -> QAService.selectTopic(qaServiceMap, req.params(TOPIC_PARAM)).getNumDocs(),
+                gson::toJson);
+
+        get(QA_LIST,
+                (req, res) -> {
+                    val topic = req.params(TOPIC_PARAM);
+                    val filter = Optional.ofNullable(req.queryParams(FILTER_PARAM));
+                    Optional<List<QAPair>> allQA;
+                    if (filter.isPresent()) {
+                        val qaService = QAService.selectTopic(qaServiceMap, topic);
+                        switch (filter.get()) {
+                            case FILTER_SOLVED:
+                                allQA = qaService.getFiltered(QAService.FilterCondition.SOLVED);
+                                break;
+                            case FILTER_UNSOLVED:
+                                allQA = qaService.getFiltered(QAService.FilterCondition.UNSOLVED);
+                                break;
+                            default:
+                                allQA = qaService.getFiltered(QAService.FilterCondition.ALL);
+                                break;
+                        }
+                        if (allQA.isPresent()) {
+                            return allQA.get();
+                        }
+                        res.status(204);
+                        return "";
+                    }
+                    res.status(400);
+                    return "";
+                },
+                gson::toJson);
+        get(RouteMap.ASK,
+                (req, res) -> {
+                    val topic = req.params(TOPIC_PARAM);
+                    val quest = Optional.ofNullable(req.queryParams(QUEST_PARAM));
+
+                    if (quest.isPresent()) {
+                        val qaService = QAService.selectTopic(qaServiceMap, topic);
+
+                        Optional<QAPair> answer = qaService.getAnswer(quest.get());
+                        if (answer.isPresent()) {
+                            res.status(200);
+                            return answer.get();
+                        }
+                        QAService.selectTopic(qaServiceMap, topic)
+                                .addQAPair(quest.get(), QAService.UNSOLVED_MARKER, true);
+                        res.status(202);
+                        return fallbackUnknown;
+                    }
+                    res.status(400);
                     return "";
                 },
                 gson::toJson);
 
-        get("/topic/:topic/solved",
-                (req, res) -> {
-                    Optional<List<QAPair>> solved = QAService.selectTopic(qaServiceMap, req.params(":topic"))
-                            .getFiltered(QAService.FilterCondition.SOLVED);
-                    if (solved.isPresent()) {
-                        return solved.get();
-                    }
-                    res.status(204);
-                    return "";
-                },
-                gson::toJson);
-
-        get("/topic/:topic/unsolved",
-                (req, res) -> {
-                    Optional<List<QAPair>> unsolved = QAService.selectTopic(qaServiceMap, req.params(":topic"))
-                            .getFiltered(QAService.FilterCondition.UNSOLVED);
-                    if (unsolved.isPresent()) {
-                        return unsolved.get();
-                    }
-                    res.status(204);
-                    return "";
-                },
-                gson::toJson);
-
-        get("/topic/:topic/:quest",
-                (req, res) -> {
-                    Optional<QAPair> answer = QAService.selectTopic(qaServiceMap, req.params(":topic"))
-                            .getAnswer(req.params(":quest"));
-                    if (answer.isPresent()) {
-                        res.status(200);
-                        return answer.get();
-                    }
-                    QAService.selectTopic(qaServiceMap, req.params(":topic"))
-                            .addQAPair(req.params(":quest"), QAService.UNSOLVED_MARKER, true);
-                    res.status(202);
-                    return fallbackUnknown;
-                },
-                gson::toJson);
-
-        post("/teach",
+        post(TEACH,
                 (req, res) -> {
                     QAPair qa = QAPair.fromJson(req.body());
                     if (!qa.isValid()) {
