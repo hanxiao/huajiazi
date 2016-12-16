@@ -28,7 +28,7 @@ import java.util.Set;
 @Slf4j
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LuceneIndexer {
+class LuceneIndexer {
 
     Analyzer analyzer = AnalyzerManager.chineseIKSmartAnalyzer;
     Directory index;

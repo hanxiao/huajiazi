@@ -21,15 +21,10 @@ import java.util.stream.Collectors;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class QAService {
-    public enum FilterCondition {
-        ALL, UNSOLVED, SOLVED
-    }
-
     public static String UNSOLVED_MARKER = "unsolved";
     LuceneIndexer luceneIndexer;
     LuceneReader luceneReader;
     String curTopic;
-
     QAService(Set<QAPair> qaStates, String topic, boolean overwrite, String dir) {
         curTopic = topic;
         String indexDir = dir.endsWith("/") ? dir : dir + "/";
@@ -143,5 +138,9 @@ public class QAService {
         } catch (IOException ex) {
             log.error("Something wrong when printing service info", ex);
         }
+    }
+
+    private enum FilterCondition {
+        ALL, UNSOLVED, SOLVED
     }
 }

@@ -16,7 +16,7 @@ import java.nio.file.Paths;
 @Accessors(chain = true)
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LuceneReaderBuilder {
+class LuceneReaderBuilder {
     Analyzer analyzer = AnalyzerManager.chineseIKSmartAnalyzer;
     Directory index = new RAMDirectory();
     int numAnswer = 5;
