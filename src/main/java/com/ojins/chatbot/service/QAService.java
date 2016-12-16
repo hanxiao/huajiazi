@@ -140,7 +140,7 @@ public class QAService {
         }
     }
 
-    private enum FilterCondition {
+    public enum FilterCondition {
         ALL, UNSOLVED, SOLVED
     }
 }

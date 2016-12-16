@@ -180,7 +180,7 @@ public class TestController {
 
     }
 
-    private static class TestWebServer implements SparkApplication {
+    public static class TestWebServer implements SparkApplication {
         @Override
         public void init() {
             new QAControllerBuilder()
