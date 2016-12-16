@@ -9,7 +9,9 @@
 
 ## Install
 
-In order to correctly parse the annotation in the code, you will need to install
+It's a Maven project, use `mvn clean install` to compile it.
+
+The project use [lombok](https://projectlombok.org/) anotations. In order to correctly parse them, you need to install
 `lombok plugin` in your IntelliJ.
 
 Default port is `9090`.
@@ -58,7 +60,7 @@ It will return
 POST http://server:port/teach
 ```
 with the following payload:
-```
+```json
 {
     "question": "你的作者是哪里人",
     "answer": "北京",
