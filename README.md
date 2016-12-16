@@ -1,6 +1,6 @@
 # 话匣子
 
-我知道拼音拼错了, 暂时懒得改了。
+我知道项目名称拼音拼错了, 正确的读法是[huà xiá zi] 暂时懒得改了。
 
 [![Build Status](https://travis-ci.org/hanxiao/huajiazi.svg?branch=master)](https://travis-ci.org/hanxiao/huajiazi)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/2ddf51266f9747049a7ae9c96cda871a)](https://www.codacy.com/app/artex-xh/huajiazi?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hanxiao/huajiazi&amp;utm_campaign=Badge_Grade)
@@ -35,7 +35,7 @@ GET http://server:port/phd/size
 - Get solved QAPs: ```http://server:port/phd/list?filter=solved```
 - Get unsolved QAPs: ```http://server:port/phd/list?filter=unsolved```
 
-### To ask a question, e.g. `你好`
+### To ask a question, e.g. `你的作者是`
 ```
 GET http://server:port/phd?query=你的作者是
 ```
@@ -60,7 +60,7 @@ POST http://server:port/teach
 with the following payload:
 ```
 {
-    "question": "你的你的作者是哪里人",
+    "question": "你的作者是哪里人",
     "answer": "北京",
     "topic": "phd"
 }
