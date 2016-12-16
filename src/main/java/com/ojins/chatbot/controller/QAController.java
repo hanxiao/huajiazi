@@ -66,11 +66,11 @@ public class QAController {
         get("/topic",
                 (req, res) -> QAService.getAvailableTopics(indexDir), gson::toJson);
 
-        get("/:topic/size",
+        get("/topic/:topic/size",
                 (req, res) -> QAService.selectTopic(qaServiceMap, req.params(":topic")).getNumDocs(),
                 gson::toJson);
 
-        get("/:topic",
+        get("/topic/:topic",
                 (req, res) -> {
                     Optional<List<QAPair>> allQA = QAService.selectTopic(qaServiceMap, req.params(":topic"))
                             .getFiltered(QAService.FilterCondition.ALL);
@@ -82,7 +82,7 @@ public class QAController {
                 },
                 gson::toJson);
 
-        get("/:topic/solved",
+        get("/topic/:topic/solved",
                 (req, res) -> {
                     Optional<List<QAPair>> solved = QAService.selectTopic(qaServiceMap, req.params(":topic"))
                             .getFiltered(QAService.FilterCondition.SOLVED);
@@ -94,7 +94,7 @@ public class QAController {
                 },
                 gson::toJson);
 
-        get("/:topic/unsolved",
+        get("/topic/:topic/unsolved",
                 (req, res) -> {
                     Optional<List<QAPair>> unsolved = QAService.selectTopic(qaServiceMap, req.params(":topic"))
                             .getFiltered(QAService.FilterCondition.UNSOLVED);
@@ -106,7 +106,7 @@ public class QAController {
                 },
                 gson::toJson);
 
-        get("/:topic/:quest",
+        get("/topic/:topic/:quest",
                 (req, res) -> {
                     Optional<QAPair> answer = QAService.selectTopic(qaServiceMap, req.params(":topic"))
                             .getAnswer(req.params(":quest"));
